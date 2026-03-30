@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PackTrack — Housesit Inventory</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #252936;
+      --border: #2e3347;
+      --text: #e8eaf0;
+      --text-dim: #8b8fa8;
+      --accent: #6c63ff;
+      --accent-glow: rgba(108, 99, 255, 0.25);
+      --in: #22c55e;
+      --in-glow: rgba(34, 197, 94, 0.2);
+      --out: #ef4444;
+      --out-glow: rgba(239, 68, 68, 0.2);
+      --garage: #f59e0b;
+      --garage-glow: rgba(245, 158, 11, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .out-count {
+      background: var(--out);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .out-count:hover { background: #dc2626; }
+
+    .out-count.all-out {
+      animation: pulse 1s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* Search */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px 12px 42px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Zone filters */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .filter-btn.all-count::after {
+      content: attr(data-count);
+      margin-left: 6px;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    /* Add item form */
+    .add-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .add-form input[type="text"] {
+      flex: 1;
+      min-width: 160px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .add-form input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .add-form select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .add-form select:focus {
+      border-color: var(--accent);
+    }
+
+    .add-btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover {
+      background: #5b54e0;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Checklist */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .list-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .list-count {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s;
+    }
+
+    .item.out {
+      border-color: var(--out);
+      background: linear-gradient(90deg, var(--out-glow) 0%, var(--surface) 40%);
+    }
+
+    .item.in {
+      border-color: var(--in);
+      background: linear-gradient(90deg, var(--in-glow) 0%, var(--surface) 40%);
+    }
+
+    .item-name {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .item-zone {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .item-zone.Kitchen { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+    .item-zone.Bath { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .item-zone.Bedroom { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+    .item-zone.Living { background: rgba(253, 224, 71, 0.15); color: #fde047; }
+    .item-zone.Dining { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+    .item-zone.Office { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .item-zone.Garage { background: var(--garage-glow); color: var(--garage); }
+    .item-zone.Storage { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 60px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .toggle input:checked + .toggle-track {
+      background: var(--out);
+      border-color: var(--out);
+    }
+
+    .toggle input:checked + .toggle-track::after {
+      transform: translateX(30px);
+    }
+
+    .toggle-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+      z-index: 1;
+      transition: color 0.3s;
+    }
+
+    .toggle-label.out { color: white; }
+    .toggle-label.in { color: var(--text-dim); }
+    .toggle input:checked ~ .toggle-label.in { color: white; }
+    .toggle input:not(:checked) ~ .toggle-label.out { color: var(--text-dim); }
+
+    /* Delete */
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+      color: var(--out);
+      background: var(--out-glow);
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .empty p {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      opacity: 0.5;
+    }
+
+    /* Mobile */
+    @media (max-width: 500px) {
+      body { padding: 14px; }
+      .item { padding: 12px; }
+      .item-zone { display: none; }
+      .add-form select { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    <div>
+      <h1>PackTrack</h1>
+      <div class="subtitle">Housesit Inventory</div>
+    </div>
+  </div>
+  <div class="out-count" id="outCount" onclick="markAllOut()">0 IN</div>
+</header>
+
+<div class="search-wrap">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+  </svg>
+  <input type="text" id="search" placeholder="Search items..." oninput="render()">
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div class="add-form">
+  <input type="text" id="newName" placeholder="Item name..." onkeydown="if(event.key==='Enter')addItem()">
+  <select id="newZone">
+    <option value="Kitchen">Kitchen</option>
+    <option value="Bath">Bath</option>
+    <option value="Bedroom">Bedroom</option>
+    <option value="Living">Living Room</option>
+    <option value="Dining">Dining Room</option>
+    <option value="Office" selected>Office</option>
+    <option value="Garage">Garage</option>
+    <option value="Storage">Storage</option>
+  </select>
+  <button class="add-btn" onclick="addItem()">Add</button>
+</div>
+
+<div class="list-header">
+  <span class="list-title" id="listTitle">All Items</span>
+  <span class="list-count" id="listCount"></span>
+</div>
+
+<div class="items" id="items"></div>
+
+<div class="footer">Data lives in your browser — clear cache = gone</div>
+
+<script>
+const ZONES = ['All','Kitchen','Bath','Bedroom','Living','Dining','Office','Garage','Storage'];
+const STORAGE_KEY = 'packtrack_items';
+let activeZone = 'All';
+let items = [];
+
+function load() {
+  try { items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { items = []; }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+function addItem() {
+  const name = document.getElementById('newName').value.trim();
+  const zone = document.getElementById('newZone').value;
+  if (!name) return;
+  items.push({ id: Date.now(), name, zone, packed: false });
+  document.getElementById('newName').value = '';
+  document.getElementById('newName').focus();
+  save();
+  render();
+}
+
+function toggle(id) {
+  const item = items.find(i => i.id === id);
+  if (item) { item.packed = !item.packed; save(); render(); }
+}
+
+function remove(id) {
+  items = items.filter(i => i.id !== id);
+  save();
+  render();
+}
+
+function setZone(z) {
+  activeZone = z;
+  render();
+}
+
+function markAllOut() {
+  const el = document.getElementById('outCount');
+  const allIn = items.filter(i => !i.packed).length === 0 && items.length > 0;
+  if (allIn) {
+    // All are OUT — mark all IN
+    items.forEach(i => i.packed = false);
+    el.classList.remove('all-out');
+  } else {
+    // All are IN — mark all OUT
+    items.forEach(i => i.packed = true);
+    el.classList.add('all-out');
+    setTimeout(() => el.classList.remove('all-out'), 600);
+  }
+  save();
+  render();
+}
+
+function render() {
+  // Filters
+  const search = document.getElementById('search').value.toLowerCase();
+  const zoneCounts = {};
+  ZONES.slice(1).forEach(z => zoneCounts[z] = 0);
+  items.forEach(i => { if (i.zone in zoneCounts) zoneCounts[i.zone]++; });
+
+  let filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="all-count" data-count="${items.length}"></span></button>`;
+  ZONES.slice(1).forEach(z => {
+    if (zoneCounts[z] > 0 || activeZone === z) {
+      filtersHtml += `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="all-count" data-count="${zoneCounts[z]}"></span></button>`;
+    }
+  });
+  document.getElementById('filters').innerHTML = filtersHtml;
+
+  // Filter + search
+  const shown = items.filter(i => {
+    const matchZone = activeZone === 'All' || i.zone === activeZone;
+    const matchSearch = !search || i.name.toLowerCase().includes(search);
+    return matchZone && matchSearch;
+  });
+
+  // Header
+  document.getElementById('listTitle').textContent =
+    activeZone === 'All' ? 'All Items' : `${activeZone} Items`;
+  document.getElementById('listCount').textContent =
+    `${shown.length} of ${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+  // Out count badge
+  const inCount = items.filter(i => !i.packed).length;
+  const outCount = items.length - inCount;
+  const badge = document.getElementById('outCount');
+  if (inCount === 0 && items.length > 0) {
+    badge.textContent = 'ALL OUT ✓';
+    badge.style.background = 'var(--in)';
+  } else {
+    badge.textContent = `${inCount} IN`;
+    badge.style.background = '';
+  }
+
+  // Items
+  if (shown.length === 0) {
+    document.getElementById('items').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">${items.length === 0 ? '🧳' : '🔍'}</div>
+        <p>${items.length === 0 ? 'Your pack list is empty.<br>Add your first item above.' : 'No items match your search.'}</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('items').innerHTML = shown.map(i => `
+    <div class="item ${i.packed ? 'out' : 'in'}">
+      <div class="item-name">${esc(i.name)}</div>
+      <span class="item-zone ${i.zone}">${i.zone}</span>
+      <label class="toggle">
+        <input type="checkbox" ${i.packed ? 'checked' : ''} onchange="toggle(${i.id})">
+        <div class="toggle-track"></div>
+        <div class="toggle-label out">OUT</div>
+        <div class="toggle-label in">IN</div>
+      </label>
+      <button class="delete-btn" onclick="remove(${i.id})" title="Remove">×</button>
+    </div>`).join('');
+
+  document.querySelectorAll('.filter-btn.all-count').forEach(el => {
+    const btn = el.parentElement;
+    const z = btn.textContent.trim().split(/\s/)[0];
+    el.textContent = z === 'All' ? ` (${items.length})` : ` (${zoneCounts[z] || 0})`;
+  });
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+load();
+render();
+</script>
+</body>
+</html>
