@@ -26,6 +26,7 @@
       --out-glow: rgba(239, 68, 68, 0.2);
       --garage: #f59e0b;
       --garage-glow: rgba(245, 158, 11, 0.15);
+      --syncing: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,26 +81,36 @@
     }
 
     .out-count {
-      background: var(--out);
-      color: white;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
       font-size: 12px;
       font-weight: 700;
       padding: 4px 10px;
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .out-count:hover { background: #dc2626; }
+    .out-count:hover { border-color: var(--accent); color: var(--text); }
+    .out-count.all-out { background: var(--in); border-color: var(--in); color: white; animation: pulse 1s ease-in-out; }
 
-    .out-count.all-out {
-      animation: pulse 1s ease-in-out;
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--in);
+      flex-shrink: 0;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
+    .sync-dot.syncing { background: var(--syncing); animation: blink 1s infinite; }
+    .sync-dot.error { background: var(--out); }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
 
     /* Search */
     .search-wrap {
@@ -153,10 +164,7 @@
       font-family: inherit;
     }
 
-    .filter-btn:hover {
-      border-color: var(--accent);
-      color: var(--text);
-    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
 
     .filter-btn.active {
       background: var(--accent);
@@ -165,9 +173,8 @@
       box-shadow: 0 0 12px var(--accent-glow);
     }
 
-    .filter-btn.all-count::after {
-      content: attr(data-count);
-      margin-left: 6px;
+    .filter-btn .count {
+      margin-left: 5px;
       font-size: 11px;
       opacity: 0.7;
     }
@@ -199,9 +206,7 @@
       transition: border-color 0.2s;
     }
 
-    .add-form input[type="text"]:focus {
-      border-color: var(--accent);
-    }
+    .add-form input[type="text"]:focus { border-color: var(--accent); }
 
     .add-form select {
       background: var(--surface2);
@@ -216,9 +221,7 @@
       transition: border-color 0.2s;
     }
 
-    .add-form select:focus {
-      border-color: var(--accent);
-    }
+    .add-form select:focus { border-color: var(--accent); }
 
     .add-btn {
       background: var(--accent);
@@ -234,12 +237,10 @@
       white-space: nowrap;
     }
 
-    .add-btn:hover {
-      background: #5b54e0;
-      box-shadow: 0 0 16px var(--accent-glow);
-    }
+    .add-btn:hover { box-shadow: 0 0 16px var(--accent-glow); }
+    .add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Checklist */
+    /* List header */
     .list-header {
       display: flex;
       align-items: center;
@@ -255,16 +256,10 @@
       letter-spacing: 0.5px;
     }
 
-    .list-count {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
+    .list-count { font-size: 12px; color: var(--text-dim); }
 
-    .items {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    /* Items */
+    .items { display: flex; flex-direction: column; gap: 8px; }
 
     .item {
       background: var(--surface);
@@ -277,27 +272,17 @@
       transition: all 0.3s;
     }
 
-    .item.out {
-      border-color: var(--out);
-      background: linear-gradient(90deg, var(--out-glow) 0%, var(--surface) 40%);
-    }
+    .item.out { border-color: var(--out); background: linear-gradient(90deg, var(--out-glow) 0%, var(--surface) 40%); }
+    .item.in { border-color: var(--in); background: linear-gradient(90deg, var(--in-glow) 0%, var(--surface) 40%); }
 
-    .item.in {
-      border-color: var(--in);
-      background: linear-gradient(90deg, var(--in-glow) 0%, var(--surface) 40%);
-    }
-
-    .item-name {
-      flex: 1;
-      font-size: 15px;
-      font-weight: 500;
-    }
+    .item-name { flex: 1; font-size: 15px; font-weight: 500; }
 
     .item-zone {
       font-size: 12px;
       padding: 3px 10px;
       border-radius: 12px;
       font-weight: 600;
+      flex-shrink: 0;
     }
 
     .item-zone.Kitchen { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
@@ -309,7 +294,7 @@
     .item-zone.Garage { background: var(--garage-glow); color: var(--garage); }
     .item-zone.Storage { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
 
-    /* Toggle switch */
+    /* Toggle */
     .toggle {
       position: relative;
       width: 60px;
@@ -317,11 +302,7 @@
       flex-shrink: 0;
     }
 
-    .toggle input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
 
     .toggle-track {
       position: absolute;
@@ -346,14 +327,8 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
 
-    .toggle input:checked + .toggle-track {
-      background: var(--out);
-      border-color: var(--out);
-    }
-
-    .toggle input:checked + .toggle-track::after {
-      transform: translateX(30px);
-    }
+    .toggle input:checked + .toggle-track { background: var(--out); border-color: var(--out); }
+    .toggle input:checked + .toggle-track::after { transform: translateX(30px); }
 
     .toggle-label {
       position: absolute;
@@ -374,7 +349,6 @@
     .toggle input:checked ~ .toggle-label.in { color: white; }
     .toggle input:not(:checked) ~ .toggle-label.out { color: var(--text-dim); }
 
-    /* Delete */
     .delete-btn {
       background: none;
       border: none;
@@ -388,10 +362,7 @@
       flex-shrink: 0;
     }
 
-    .delete-btn:hover {
-      color: var(--out);
-      background: var(--out-glow);
-    }
+    .delete-btn:hover { color: var(--out); background: var(--out-glow); }
 
     /* Empty state */
     .empty {
@@ -400,15 +371,27 @@
       color: var(--text-dim);
     }
 
-    .empty-icon {
-      font-size: 42px;
-      margin-bottom: 12px;
+    .empty-icon { font-size: 42px; margin-bottom: 12px; }
+    .empty p { font-size: 15px; line-height: 1.6; }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-dim);
     }
 
-    .empty p {
-      font-size: 15px;
-      line-height: 1.6;
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
     }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Footer */
     .footer {
@@ -438,7 +421,10 @@
       <div class="subtitle">Housesit Inventory</div>
     </div>
   </div>
-  <div class="out-count" id="outCount" onclick="markAllOut()">0 IN</div>
+  <div class="out-count" id="outCount" onclick="markAllOut()">
+    <div class="sync-dot" id="syncDot" title="Synced with Nextcloud"></div>
+    <span id="countLabel">0 IN</span>
+  </div>
 </header>
 
 <div class="search-wrap">
@@ -462,7 +448,7 @@
     <option value="Garage">Garage</option>
     <option value="Storage">Storage</option>
   </select>
-  <button class="add-btn" onclick="addItem()">Add</button>
+  <button class="add-btn" id="addBtn" onclick="addItem()">Add</button>
 </div>
 
 <div class="list-header">
@@ -472,42 +458,92 @@
 
 <div class="items" id="items"></div>
 
-<div class="footer">Data lives in your browser — clear cache = gone</div>
+<div class="footer">Data synced with Nextcloud · smartconfigurations.com</div>
 
 <script>
 const ZONES = ['All','Kitchen','Bath','Bedroom','Living','Dining','Office','Garage','Storage'];
-const STORAGE_KEY = 'packtrack_items';
-let activeZone = 'All';
+const WEBDAV_URL = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packlist.json';
+const CREDENTIALS = btoa('ow9cg:k9KE?6a7m%66I');
+
 let items = [];
+let activeZone = 'All';
+let syncing = false;
 
-function load() {
-  try { items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { items = []; }
-}
-
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
-function addItem() {
-  const name = document.getElementById('newName').value.trim();
-  const zone = document.getElementById('newZone').value;
-  if (!name) return;
-  items.push({ id: Date.now(), name, zone, packed: false });
-  document.getElementById('newName').value = '';
-  document.getElementById('newName').focus();
-  save();
+async function load() {
+  setSyncing(true);
+  try {
+    const resp = await fetch(WEBDAV_URL, {
+      headers: { 'Authorization': 'Basic ' + CREDENTIALS }
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      items = data.items || [];
+    } else if (resp.status === 404) {
+      items = [];
+    } else {
+      throw new Error('HTTP ' + resp.status);
+    }
+  } catch(e) {
+    console.warn('Could not load from Nextcloud, using local fallback:', e.message);
+    // LocalStorage fallback for offline/error
+    try { items = JSON.parse(localStorage.getItem('packtrack_items') || '[]'); }
+    catch { items = []; }
+  }
+  setSyncing(false);
   render();
 }
 
-function toggle(id) {
-  const item = items.find(i => i.id === id);
-  if (item) { item.packed = !item.packed; save(); render(); }
+async function save() {
+  setSyncing(true);
+  try {
+    const payload = JSON.stringify({ items }, null, 2);
+    const resp = await fetch(WEBDAV_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Basic ' + CREDENTIALS,
+        'Content-Type': 'application/json'
+      },
+      body: payload
+    });
+    if (!resp.ok && resp.status !== 404) {
+      throw new Error('HTTP ' + resp.status);
+    }
+    // Also update localStorage as backup
+    localStorage.setItem('packtrack_items', payload);
+  } catch(e) {
+    console.warn('Could not save to Nextcloud, saving locally:', e.message);
+    localStorage.setItem('packtrack_items', JSON.stringify({ items }));
+  }
+  setSyncing(false);
 }
 
-function remove(id) {
+function setSyncing(val) {
+  syncing = val;
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot' + (val ? ' syncing' : '');
+}
+
+async function addItem() {
+  const name = document.getElementById('newName').value.trim();
+  const zone = document.getElementById('newZone').value;
+  if (!name) return;
+  document.getElementById('addBtn').disabled = true;
+  items.push({ id: Date.now(), name, zone, packed: false });
+  document.getElementById('newName').value = '';
+  document.getElementById('newName').focus();
+  await save();
+  render();
+  document.getElementById('addBtn').disabled = false;
+}
+
+async function toggle(id) {
+  const item = items.find(i => i.id === id);
+  if (item) { item.packed = !item.packed; await save(); render(); }
+}
+
+async function remove(id) {
   items = items.filter(i => i.id !== id);
-  save();
+  await save();
   render();
 }
 
@@ -516,69 +552,61 @@ function setZone(z) {
   render();
 }
 
-function markAllOut() {
-  const el = document.getElementById('outCount');
+async function markAllOut() {
   const allIn = items.filter(i => !i.packed).length === 0 && items.length > 0;
   if (allIn) {
-    // All are OUT — mark all IN
     items.forEach(i => i.packed = false);
-    el.classList.remove('all-out');
+    document.getElementById('outCount').classList.remove('all-out');
   } else {
-    // All are IN — mark all OUT
     items.forEach(i => i.packed = true);
-    el.classList.add('all-out');
-    setTimeout(() => el.classList.remove('all-out'), 600);
+    document.getElementById('outCount').classList.add('all-out');
+    setTimeout(() => document.getElementById('outCount').classList.remove('all-out'), 600);
   }
-  save();
+  await save();
   render();
 }
 
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function render() {
-  // Filters
   const search = document.getElementById('search').value.toLowerCase();
   const zoneCounts = {};
   ZONES.slice(1).forEach(z => zoneCounts[z] = 0);
   items.forEach(i => { if (i.zone in zoneCounts) zoneCounts[i.zone]++; });
 
-  let filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="all-count" data-count="${items.length}"></span></button>`;
+  let filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="count">${items.length}</span></button>`;
   ZONES.slice(1).forEach(z => {
     if (zoneCounts[z] > 0 || activeZone === z) {
-      filtersHtml += `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="all-count" data-count="${zoneCounts[z]}"></span></button>`;
+      filtersHtml += `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="count">${zoneCounts[z]}</span></button>`;
     }
   });
   document.getElementById('filters').innerHTML = filtersHtml;
 
-  // Filter + search
   const shown = items.filter(i => {
     const matchZone = activeZone === 'All' || i.zone === activeZone;
     const matchSearch = !search || i.name.toLowerCase().includes(search);
     return matchZone && matchSearch;
   });
 
-  // Header
-  document.getElementById('listTitle').textContent =
-    activeZone === 'All' ? 'All Items' : `${activeZone} Items`;
-  document.getElementById('listCount').textContent =
-    `${shown.length} of ${items.length} item${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('listTitle').textContent = activeZone === 'All' ? 'All Items' : `${activeZone} Items`;
+  document.getElementById('listCount').textContent = `${shown.length} of ${items.length} item${items.length !== 1 ? 's' : ''}`;
 
-  // Out count badge
   const inCount = items.filter(i => !i.packed).length;
   const outCount = items.length - inCount;
-  const badge = document.getElementById('outCount');
+  const label = document.getElementById('countLabel');
   if (inCount === 0 && items.length > 0) {
-    badge.textContent = 'ALL OUT ✓';
-    badge.style.background = 'var(--in)';
+    label.textContent = 'ALL OUT ✓';
   } else {
-    badge.textContent = `${inCount} IN`;
-    badge.style.background = '';
+    label.textContent = `${inCount} IN`;
   }
 
-  // Items
-  if (shown.length === 0) {
+  if (items.length === 0) {
     document.getElementById('items').innerHTML = `
       <div class="empty">
-        <div class="empty-icon">${items.length === 0 ? '🧳' : '🔍'}</div>
-        <p>${items.length === 0 ? 'Your pack list is empty.<br>Add your first item above.' : 'No items match your search.'}</p>
+        <div class="empty-icon">🧳</div>
+        <p>Your pack list is empty.<br>Add your first item above.</p>
       </div>`;
     return;
   }
@@ -595,20 +623,10 @@ function render() {
       </label>
       <button class="delete-btn" onclick="remove(${i.id})" title="Remove">×</button>
     </div>`).join('');
-
-  document.querySelectorAll('.filter-btn.all-count').forEach(el => {
-    const btn = el.parentElement;
-    const z = btn.textContent.trim().split(/\s/)[0];
-    el.textContent = z === 'All' ? ` (${items.length})` : ` (${zoneCounts[z] || 0})`;
-  });
 }
 
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
+// Init
 load();
-render();
 </script>
 </body>
 </html>
