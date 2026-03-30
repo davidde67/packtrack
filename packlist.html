@@ -26,7 +26,6 @@
       --out-glow: rgba(239, 68, 68, 0.2);
       --garage: #f59e0b;
       --garage-glow: rgba(245, 158, 11, 0.15);
-      --syncing: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,6 +40,108 @@
       margin: 0 auto;
     }
 
+    /* ─── AUTH SCREEN ─── */
+    .auth-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .auth-logo {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .auth-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .auth-code-display {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .auth-digit {
+      width: 48px;
+      height: 56px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: 'SF Mono', 'Courier New', monospace;
+    }
+
+    .auth-digit:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .auth-digit.filled {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .auth-error {
+      color: var(--out);
+      font-size: 13px;
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+
+    .auth-btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 14px 36px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .auth-btn:hover { background: #5b54e0; box-shadow: 0 0 20px var(--accent-glow); }
+    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .auth-hint {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-dim);
+      opacity: 0.6;
+    }
+
+    /* Hidden helper for OTP auto-advancing */
+    .auth-hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ─── APP SCREEN ─── */
+    .app-screen { display: none; }
+
     header {
       display: flex;
       align-items: center;
@@ -50,11 +151,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .logo { display: flex; align-items: center; gap: 10px; }
 
     .logo-icon {
       width: 36px;
@@ -68,17 +165,31 @@
       box-shadow: 0 0 20px var(--accent-glow);
     }
 
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .subtitle { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .subtitle {
-      font-size: 12px;
+    .lock-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
       color: var(--text-dim);
-      margin-top: 2px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
+
+    .lock-btn:hover { border-color: var(--out); color: var(--out); }
 
     .out-count {
       background: var(--surface2);
@@ -98,25 +209,9 @@
     .out-count:hover { border-color: var(--accent); color: var(--text); }
     .out-count.all-out { background: var(--in); border-color: var(--in); color: white; animation: pulse 1s ease-in-out; }
 
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--in);
-      flex-shrink: 0;
-    }
-
-    .sync-dot.syncing { background: var(--syncing); animation: blink 1s infinite; }
-    .sync-dot.error { background: var(--out); }
-
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
 
-    /* Search */
-    .search-wrap {
-      position: relative;
-      margin-bottom: 16px;
-    }
+    .search-wrap { position: relative; margin-bottom: 16px; }
 
     .search-wrap svg {
       position: absolute;
@@ -139,18 +234,9 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    #search:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
+    #search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-    /* Zone filters */
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 
     .filter-btn {
       background: var(--surface);
@@ -165,21 +251,9 @@
     }
 
     .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 0 12px var(--accent-glow); }
+    .filter-btn .count { margin-left: 5px; font-size: 11px; opacity: 0.7; }
 
-    .filter-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .filter-btn .count {
-      margin-left: 5px;
-      font-size: 11px;
-      opacity: 0.7;
-    }
-
-    /* Add item form */
     .add-form {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -240,25 +314,11 @@
     .add-btn:hover { box-shadow: 0 0 16px var(--accent-glow); }
     .add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* List header */
-    .list-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+    .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 
-    .list-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
+    .list-title { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
     .list-count { font-size: 12px; color: var(--text-dim); }
 
-    /* Items */
     .items { display: flex; flex-direction: column; gap: 8px; }
 
     .item {
@@ -294,14 +354,7 @@
     .item-zone.Garage { background: var(--garage-glow); color: var(--garage); }
     .item-zone.Storage { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
 
-    /* Toggle */
-    .toggle {
-      position: relative;
-      width: 60px;
-      height: 30px;
-      flex-shrink: 0;
-    }
-
+    .toggle { position: relative; width: 60px; height: 30px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; }
 
     .toggle-track {
@@ -364,23 +417,11 @@
 
     .delete-btn:hover { color: var(--out); background: var(--out-glow); }
 
-    /* Empty state */
-    .empty {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text-dim);
-    }
-
+    .empty { text-align: center; padding: 48px 20px; color: var(--text-dim); }
     .empty-icon { font-size: 42px; margin-bottom: 12px; }
     .empty p { font-size: 15px; line-height: 1.6; }
 
-    /* Loading */
-    .loading {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text-dim);
-    }
-
+    .loading { text-align: center; padding: 48px 20px; color: var(--text-dim); }
     .spinner {
       width: 32px;
       height: 32px;
@@ -393,84 +434,246 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Footer */
-    .footer {
-      margin-top: 32px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-dim);
-      opacity: 0.5;
-    }
+    .footer { margin-top: 32px; text-align: center; font-size: 12px; color: var(--text-dim); opacity: 0.5; }
 
-    /* Mobile */
     @media (max-width: 500px) {
       body { padding: 14px; }
       .item { padding: 12px; }
       .item-zone { display: none; }
       .add-form select { min-width: 100%; }
+      .auth-digit { width: 40px; height: 50px; font-size: 24px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">📦</div>
-    <div>
-      <h1>PackTrack</h1>
-      <div class="subtitle">Housesit Inventory</div>
+<!-- ─── AUTH SCREEN ─── -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-logo">📦</div>
+  <div class="auth-title">PackTrack</div>
+  <div class="auth-subtitle" id="authSubtitle">Enter your shared passcode<br>to access your inventory</div>
+
+  <div class="auth-code-display" id="codeDisplay">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="0" autocomplete="off">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="1" autocomplete="off">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="2" autocomplete="off">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="3" autocomplete="off">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="4" autocomplete="off">
+    <input class="auth-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="5" autocomplete="off">
+  </div>
+
+  <div class="auth-error" id="authError"></div>
+
+  <button class="auth-btn" id="authBtn" onclick="handleAuth()">Unlock</button>
+
+  <div class="auth-hint" id="authHint"></div>
+</div>
+
+<!-- ─── APP SCREEN ─── -->
+<div class="app-screen" id="appScreen">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">📦</div>
+      <div>
+        <h1>PackTrack</h1>
+        <div class="subtitle">Housesit Inventory</div>
+      </div>
     </div>
+    <div class="header-right">
+      <button class="lock-btn" onclick="lock()">🔒 Lock</button>
+      <div class="out-count" id="outCount" onclick="markAllOut()">
+        <span id="countLabel">0 IN</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search items..." oninput="render()">
   </div>
-  <div class="out-count" id="outCount" onclick="markAllOut()">
-    <div class="sync-dot" id="syncDot" title="Synced with Nextcloud"></div>
-    <span id="countLabel">0 IN</span>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="add-form">
+    <input type="text" id="newName" placeholder="Item name..." onkeydown="if(event.key==='Enter')addItem()">
+    <select id="newZone">
+      <option value="Kitchen">Kitchen</option>
+      <option value="Bath">Bath</option>
+      <option value="Bedroom">Bedroom</option>
+      <option value="Living">Living Room</option>
+      <option value="Dining">Dining Room</option>
+      <option value="Office" selected>Office</option>
+      <option value="Garage">Garage</option>
+      <option value="Storage">Storage</option>
+    </select>
+    <button class="add-btn" id="addBtn" onclick="addItem()">Add</button>
   </div>
-</header>
 
-<div class="search-wrap">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-  </svg>
-  <input type="text" id="search" placeholder="Search items..." oninput="render()">
+  <div class="list-header">
+    <span class="list-title" id="listTitle">All Items</span>
+    <span class="list-count" id="listCount"></span>
+  </div>
+
+  <div class="items" id="items"></div>
+
+  <div class="footer">Data synced with Nextcloud · smartconfigurations.com</div>
 </div>
-
-<div class="filters" id="filters"></div>
-
-<div class="add-form">
-  <input type="text" id="newName" placeholder="Item name..." onkeydown="if(event.key==='Enter')addItem()">
-  <select id="newZone">
-    <option value="Kitchen">Kitchen</option>
-    <option value="Bath">Bath</option>
-    <option value="Bedroom">Bedroom</option>
-    <option value="Living">Living Room</option>
-    <option value="Dining">Dining Room</option>
-    <option value="Office" selected>Office</option>
-    <option value="Garage">Garage</option>
-    <option value="Storage">Storage</option>
-  </select>
-  <button class="add-btn" id="addBtn" onclick="addItem()">Add</button>
-</div>
-
-<div class="list-header">
-  <span class="list-title" id="listTitle">All Items</span>
-  <span class="list-count" id="listCount"></span>
-</div>
-
-<div class="items" id="items"></div>
-
-<div class="footer">Data synced with Nextcloud · smartconfigurations.com</div>
 
 <script>
 const ZONES = ['All','Kitchen','Bath','Bedroom','Living','Dining','Office','Garage','Storage'];
 const WEBDAV_URL = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packlist.json';
+const WEBDAV_CODE_URL = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/.packtrack_pin.json';
 const CREDENTIALS = btoa('ow9cg:k9KE?6a7m%66I');
 
 let items = [];
 let activeZone = 'All';
-let syncing = false;
+let code = '';          // the 6-digit passcode
+let mode = 'check';     // 'check' | 'setup'
+let locked = true;
+
+const digits = document.querySelectorAll('.auth-digit');
+
+// ─── AUTH ───────────────────────────────────────────────────────────────────
+
+async function initAuth() {
+  // Try to load code from Nextcloud
+  try {
+    const resp = await fetch(WEBDAV_CODE_URL, {
+      headers: { 'Authorization': 'Basic ' + CREDENTIALS }
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      code = data.code || '';
+    }
+  } catch(e) {}
+
+  if (code) {
+    mode = 'check';
+    document.getElementById('authSubtitle').textContent = 'Enter your shared passcode\nto access your inventory';
+    document.getElementById('authBtn').textContent = 'Unlock';
+    document.getElementById('authHint').innerHTML = '';
+  } else {
+    mode = 'setup';
+    document.getElementById('authSubtitle').innerHTML = 'First time setup — create a shared passcode<br>Only David & June will know this';
+    document.getElementById('authBtn').textContent = 'Set Passcode';
+    document.getElementById('authHint').innerHTML = '6 digits, numbers only';
+  }
+
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  digits[0].focus();
+}
+
+async function handleAuth() {
+  const entered = getEnteredCode();
+
+  if (mode === 'setup') {
+    if (entered.length < 6) {
+      showError('Please enter all 6 digits');
+      return;
+    }
+    code = entered;
+    // Save to Nextcloud
+    try {
+      await fetch(WEBDAV_CODE_URL, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Basic ' + CREDENTIALS,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code })
+      });
+    } catch(e) {}
+    unlock();
+  } else {
+    if (entered !== code) {
+      showError('Wrong passcode — try again');
+      clearCode();
+      return;
+    }
+    unlock();
+  }
+}
+
+function getEnteredCode() {
+  return Array.from(digits).map(d => d.value).join('');
+}
+
+function clearCode() {
+  digits.forEach(d => { d.value = ''; d.classList.remove('filled'); });
+  digits[0].focus();
+  updateBtn();
+}
+
+function showError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ''; }, 2500);
+}
+
+function updateBtn() {
+  const entered = getEnteredCode();
+  document.getElementById('authBtn').disabled = (mode === 'setup' && entered.length < 6);
+}
+
+function unlock() {
+  locked = false;
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  load();
+}
+
+// Digit input handling
+digits.forEach((digit, idx) => {
+  digit.addEventListener('input', () => {
+    digit.value = digit.value.replace(/[^0-9]/g, '');
+    if (digit.value) {
+      digit.classList.add('filled');
+      if (idx < 5) digits[idx + 1].focus();
+    }
+    updateBtn();
+    // Auto-submit on 6 digits in check mode
+    if (mode === 'check' && getEnteredCode().length === 6) {
+      handleAuth();
+    }
+  });
+
+  digit.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !digit.value && idx > 0) {
+      digits[idx - 1].focus();
+      digits[idx - 1].value = '';
+      digits[idx - 1].classList.remove('filled');
+    }
+  });
+
+  digit.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    paste.split('').forEach((ch, i) => {
+      if (digits[i]) { digits[i].value = ch; digits[i].classList.add('filled'); }
+    });
+    if (paste.length >= 6) { digits[5].focus(); updateBtn(); }
+    else { digits[paste.length]?.focus(); updateBtn(); }
+  });
+});
+
+function lock() {
+  locked = true;
+  clearCode();
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+  mode = 'check';
+  document.getElementById('authSubtitle').textContent = 'Enter your shared passcode\nto access your inventory';
+  document.getElementById('authBtn').textContent = 'Unlock';
+  document.getElementById('authHint').innerHTML = '';
+  updateBtn();
+}
+
+// ─── APP ─────────────────────────────────────────────────────────────────────
 
 async function load() {
-  setSyncing(true);
   try {
     const resp = await fetch(WEBDAV_URL, {
       headers: { 'Authorization': 'Basic ' + CREDENTIALS }
@@ -484,17 +687,13 @@ async function load() {
       throw new Error('HTTP ' + resp.status);
     }
   } catch(e) {
-    console.warn('Could not load from Nextcloud, using local fallback:', e.message);
-    // LocalStorage fallback for offline/error
     try { items = JSON.parse(localStorage.getItem('packtrack_items') || '[]'); }
     catch { items = []; }
   }
-  setSyncing(false);
   render();
 }
 
 async function save() {
-  setSyncing(true);
   try {
     const payload = JSON.stringify({ items }, null, 2);
     const resp = await fetch(WEBDAV_URL, {
@@ -505,22 +704,10 @@ async function save() {
       },
       body: payload
     });
-    if (!resp.ok && resp.status !== 404) {
-      throw new Error('HTTP ' + resp.status);
-    }
-    // Also update localStorage as backup
     localStorage.setItem('packtrack_items', payload);
   } catch(e) {
-    console.warn('Could not save to Nextcloud, saving locally:', e.message);
     localStorage.setItem('packtrack_items', JSON.stringify({ items }));
   }
-  setSyncing(false);
-}
-
-function setSyncing(val) {
-  syncing = val;
-  const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot' + (val ? ' syncing' : '');
 }
 
 async function addItem() {
@@ -547,10 +734,7 @@ async function remove(id) {
   render();
 }
 
-function setZone(z) {
-  activeZone = z;
-  render();
-}
+function setZone(z) { activeZone = z; render(); }
 
 async function markAllOut() {
   const allIn = items.filter(i => !i.packed).length === 0 && items.length > 0;
@@ -571,6 +755,7 @@ function esc(s) {
 }
 
 function render() {
+  if (locked) return;
   const search = document.getElementById('search').value.toLowerCase();
   const zoneCounts = {};
   ZONES.slice(1).forEach(z => zoneCounts[z] = 0);
@@ -594,13 +779,8 @@ function render() {
   document.getElementById('listCount').textContent = `${shown.length} of ${items.length} item${items.length !== 1 ? 's' : ''}`;
 
   const inCount = items.filter(i => !i.packed).length;
-  const outCount = items.length - inCount;
   const label = document.getElementById('countLabel');
-  if (inCount === 0 && items.length > 0) {
-    label.textContent = 'ALL OUT ✓';
-  } else {
-    label.textContent = `${inCount} IN`;
-  }
+  label.textContent = (inCount === 0 && items.length > 0) ? 'ALL OUT ✓' : `${inCount} IN`;
 
   if (items.length === 0) {
     document.getElementById('items').innerHTML = `
@@ -626,7 +806,7 @@ function render() {
 }
 
 // Init
-load();
+initAuth();
 </script>
 </body>
 </html>
