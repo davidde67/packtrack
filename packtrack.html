@@ -173,8 +173,17 @@
     .add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .list-title { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    .list-count { font-size: 12px; color: var(--text-dim); }
+    .sort-wrap { display: flex; align-items: center; gap: 8px; }
+    .sort-label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+    .sort-select {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 5px 10px; color: var(--text);
+      font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .sort-select:focus { border-color: var(--accent); }
+    .sort-select option { background: var(--surface2); color: var(--text); }
+    .list-count { font-size: 13px; color: var(--in); font-weight: 700; }
 
     .items { display: flex; flex-direction: column; gap: 8px; }
 
@@ -441,7 +450,16 @@
   </div>
 
   <div class="list-header">
-    <span class="list-title" id="listTitle">All Items</span>
+    <div class="sort-wrap">
+      <span class="sort-label">Sort:</span>
+      <select id="sortSelect" class="sort-select" onchange="setSortMode(this.value)">
+        <option value="room">By Room</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="in">IN Items</option>
+        <option value="out">OUT Items</option>
+      </select>
+    </div>
     <span class="list-count" id="listCount"></span>
   </div>
 
@@ -484,6 +502,7 @@ const CREDENTIALS = btoa('ow9cg:k9KE?6a7m%66I');
 
 let items = [];
 let activeZone = 'All';
+let sortMode = 'room'; // 'room' | 'az' | 'za' | 'in' | 'out'
 let code = '';
 let mode = 'check';
 let locked = true;
@@ -619,6 +638,7 @@ async function toggle(id) {
 }
 
 function setZone(z) { activeZone = z; render(); }
+function setSortMode(m) { sortMode = m; render(); }
 
 async function markAllOut() {
   const allIn = items.filter(i => !i.packed).length === 0 && items.length > 0;
@@ -635,25 +655,54 @@ function render() {
   const zoneCounts = {}; ZONES.forEach(z => zoneCounts[z] = 0);
   items.forEach(i => { if (i.zone in zoneCounts) zoneCounts[i.zone]++; });
 
-  let filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="count">${items.length}</span></button>`;
-  ZONES.forEach(z => {
-    if (zoneCounts[z] > 0 || activeZone === z) filtersHtml += `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="count">${zoneCounts[z]}</span></button>`;
-  });
-  document.getElementById('filters').innerHTML = filtersHtml;
-
-  const shown = items.filter(i => {
+  // Filter by zone AND search
+  let shown = items.filter(i => {
     const mZ = activeZone === 'All' || i.zone === activeZone;
     const mS = !search || i.name.toLowerCase().includes(search);
     return mZ && mS;
   });
 
-  document.getElementById('listTitle').textContent = activeZone === 'All' ? 'All Items' : `${activeZone} Items`;
-  document.getElementById('listCount').textContent = `${shown.length} of ${items.length} item${items.length !== 1 ? 's' : ''}`;
-  const inCount = items.filter(i => !i.packed).length;
-  document.getElementById('countLabel').textContent = (inCount === 0 && items.length > 0) ? 'ALL OUT ✓' : `${inCount} IN`;
+  // Apply sort mode
+  if (sortMode === 'az') {
+    shown.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortMode === 'za') {
+    shown.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (sortMode === 'room') {
+    shown.sort((a, b) => ZONES.indexOf(a.zone) - ZONES.indexOf(b.zone));
+  } else if (sortMode === 'in') {
+    shown = shown.filter(i => !i.packed);
+  } else if (sortMode === 'out') {
+    shown = shown.filter(i => i.packed);
+  }
 
+  // Zone filter pills — show counts relative to current sortMode context
+  const filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="count">${items.length}</span></button>`;
+  document.getElementById('filters').innerHTML = filtersHtml + ZONES.map(z => {
+    const cnt = items.filter(i => i.zone === z).length;
+    if (cnt === 0 && activeZone !== z) return '';
+    return `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="count">${cnt}</span></button>`;
+  }).join('');
+
+  // Right side: IN count (always total IN items, not filtered)
+  const inCount = items.filter(i => !i.packed).length;
+  const outCount = items.length - inCount;
+  const listCountEl = document.getElementById('listCount');
   if (items.length === 0) {
-    document.getElementById('items').innerHTML = `<div class="empty"><div class="empty-icon">🧳</div><p>Your pack list is empty.<br>Add your first item above.</p></div>`;
+    listCountEl.textContent = '';
+  } else if (inCount === 0) {
+    listCountEl.textContent = '✓ ALL PACKED';
+    listCountEl.style.color = 'var(--in)';
+  } else {
+    listCountEl.textContent = `${inCount} to go`;
+    listCountEl.style.color = 'var(--in)';
+  }
+
+  if (shown.length === 0) {
+    const msg = sortMode === 'in' ? 'No items packed IN yet' :
+                sortMode === 'out' ? 'No items packed OUT yet' :
+                items.length === 0 ? 'Your pack list is empty.\nAdd your first item above.' :
+                'No items match';
+    document.getElementById('items').innerHTML = `<div class="empty"><div class="empty-icon">🧳</div><p>${msg.replace(/\n/g,'<br>')}</p></div>`;
     return;
   }
 
@@ -716,10 +765,6 @@ function closeModal() {
 }
 
 function closeModalOnOverlay(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-}
-
-function closeModalOnOverlay(e) {
   if (e.target.id === 'modalOverlay') closeModal();
 }
 
@@ -762,13 +807,17 @@ async function handlePhotoUpload(event) {
   const resized = await resizeImage(file, 800);
   const blob = await new Promise(resolve => resized.toBlob(resolve, 'image/jpeg', 0.8));
 
+  const formData = new FormData();
+  formData.append('filename', String(currentItemId));
+  formData.append('image', blob, 'photo.jpg');
+
   try {
-    const resp = await fetch(`${WEBDAV_BASE}/${currentItemId}.jpg`, {
-      method: 'PUT',
-      headers: { 'Authorization': 'Basic ' + CREDENTIALS, 'Content-Type': 'image/jpeg' },
-      body: blob
+    const resp = await fetch('upload.php', {
+      method: 'POST',
+      body: formData
     });
-    if (resp.ok || resp.status === 201 || resp.status === 204) {
+    const data = await resp.json();
+    if (data.success) {
       const item = items.find(i => i.id === currentItemId);
       if (item) { item.hasImage = true; await save(); }
       status.textContent = '✓ Uploaded';
@@ -781,7 +830,7 @@ async function handlePhotoUpload(event) {
         <img src="${WEBDAV_BASE}/${currentItemId}.jpg?cb=${Date.now()}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">`;
       render();
     } else {
-      throw new Error(resp.status);
+      throw new Error(data.error || 'Upload failed');
     }
   } catch(e) {
     status.textContent = 'Upload failed — check connection';
