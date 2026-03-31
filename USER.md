@@ -21,7 +21,7 @@
 
 ## Housesitting
 
-- Current: 391 Lakeshore Dr, SF CA 94132 (through April 1)
-- Next: Starts April 2 — Diana & Bill's, 10 Margaret Ave, SF 94112 (bunny: Nietzsche 🐰)
+- Current: 391 Lakeshore Dr, SF CA 94132 (through April 1) — trash day Tuesday
+- Next: Starts April 2 — Diana & Bill's, 10 Margaret Ave, SF 94112 (bunny: Nietzsche 🐰) — trash day Friday
 - **Pet Sitting spreadsheet** has all client addresses: [Sheet](https://docs.google.com/spreadsheets/d/1F5ihKDTPPjCW62VtkgctVsEtrnXPhPowNw7F0ZDW-_8)
 _(Track future housesits here as they come up.)_

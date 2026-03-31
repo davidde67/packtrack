@@ -6,6 +6,10 @@
 - Communication: Fritz should use gentle nudges for David.
 - Phone: 323 area code (SF-based)
 
+## Trash Days (Recology SF)
+- **391 Lakeshore Dr, SF 94132 (David & June's home):** Tuesday — confirmed by David ("today is trash day" on Tue 3/31)
+- **10 Margaret Ave, SF 94112 (Diana & Bill's, Nietzsche 🐰):** Friday (Excelsior/Southwest zone)
+
 ## Housesitting
 - **Current:** 391 Lakeshore Dr, SF CA 94132 (through April 1)
 - **Next:** Diana & Bill's, 10 Margaret Ave, SF 94112 (starts April 2) — has bunny Nietzsche 🐰
@@ -26,10 +30,17 @@
 - Significant planning required — logistics, travel, etc.
 - David will lean on Fritz heavily for this.
 
-## Packing / Inventory
-- PackTrack app (packlist.html) — housesit inventory system
-- Dark theme, color-coded: in=teal, out=red, garage=yellow, accent=purple (#6c63ff)
-- Located in David's phone/files
+## PackTrack (Housesit Inventory)
+- **URL:** https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packlist.html
+- **WebDAV credentials:** user=ow9cg, pass=k9KE?6a7m%66I
+- **Zones/locations:** synced to .packtrack_zones.json on Nextcloud (Kitchen, Bath, Bedroom, Living, Dining, Office, Garage, Storage, Unassigned)
+- **Features built today (2026-03-31):**
+  - "Locations" button in header opens location manager panel
+  - Add/delete locations (delete blocked if location has items — bulk-move TBD)
+  - "Unassigned" is permanent holding zone for items without a location
+  - Confirmation modal for deletion with item count
+- **Color scheme:** dark (#0f1117), accent purple (#6c63ff), in=green (#22c55e), out=red (#ef4444)
+- **Zones color-coded in UI** — Kitchen=orange, Bath=sky, Bedroom=purple, Living=yellow, Dining=green, Office=indigo, Garage=amber, Storage=gray; custom/user zones get purple
 
 ## Technical / Preferences
 - Concerned about token burn with larger models
