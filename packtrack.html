@@ -12,383 +12,203 @@
   <title>PackTrack — Housesit Inventory</title>
   <style>
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #252936;
-      --border: #2e3347;
-      --text: #e8eaf0;
-      --text-dim: #8b8fa8;
-      --accent: #6c63ff;
-      --accent-glow: rgba(108, 99, 255, 0.25);
-      --in: #22c55e;
-      --in-glow: rgba(34, 197, 94, 0.2);
-      --out: #ef4444;
-      --out-glow: rgba(239, 68, 68, 0.2);
-      --garage: #f59e0b;
-      --garage-glow: rgba(245, 158, 11, 0.15);
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #252936; --border: #2e3347;
+      --text: #e8eaf0; --text-dim: #8b8fa8; --accent: #6c63ff;
+      --accent-glow: rgba(108,99,255,0.25); --in: #22c55e; --in-glow: rgba(34,197,94,0.2);
+      --out: #ef4444; --out-glow: rgba(239,68,68,0.2); --garage: #f59e0b; --garage-glow: rgba(245,158,11,0.15);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; min-height: 100vh; padding: 20px; max-width: 800px; margin: 0 auto; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
+    /* AUTH */
+    .auth-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; text-align:center; }
+    .auth-logo { font-size:48px; margin-bottom:16px; }
+    .auth-title { font-size:24px; font-weight:700; margin-bottom:8px; }
+    .auth-subtitle { font-size:14px; color:var(--text-dim); margin-bottom:32px; line-height:1.6; }
+    .auth-code-display { display:flex; gap:10px; margin-bottom:24px; }
+    .auth-digit { width:48px; height:56px; background:var(--surface); border:2px solid var(--border); border-radius:12px; font-size:28px; font-weight:700; text-align:center; color:var(--text); outline:none; transition:border-color .2s,box-shadow .2s; font-family:'SF Mono','Courier New',monospace; }
+    .auth-digit:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+    .auth-digit.filled { border-color:var(--accent); background:rgba(108,99,255,0.1); }
+    .auth-error { color:var(--out); font-size:13px; margin-bottom:16px; min-height:20px; }
+    .auth-btn { background:var(--accent); border:none; color:white; padding:14px 36px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; width:100%; max-width:280px; }
+    .auth-btn:hover { background:#5b54e0; box-shadow:0 0 20px var(--accent-glow); }
+    .auth-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .auth-hint { margin-top:24px; font-size:12px; color:var(--text-dim); opacity:0.6; }
 
-    /* ─── AUTH SCREEN ─── */
-    .auth-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      text-align: center;
-    }
+    /* APP */
+    .app-screen { display:none; }
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    .logo { display:flex; align-items:center; gap:10px; }
+    .logo-icon { width:36px; height:36px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 0 20px var(--accent-glow); }
+    h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
+    .subtitle { font-size:12px; color:var(--text-dim); margin-top:2px; }
+    .header-right { display:flex; align-items:center; gap:8px; }
+    .hdr-btn { background:var(--surface); border:1px solid var(--border); color:var(--text-dim); padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; font-family:inherit; transition:all .2s; display:flex; align-items:center; gap:5px; }
+    .hdr-btn:hover { border-color:var(--accent); color:var(--text); }
+    .hdr-btn.danger:hover { border-color:var(--out); color:var(--out); }
+    .hdr-btn.active { background:var(--accent); border-color:var(--accent); color:white; }
+    .hdr-btn .badge { background:var(--out); color:white; font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; margin-left:4px; }
 
-    .auth-logo { font-size: 48px; margin-bottom: 16px; }
-    .auth-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-    .auth-subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 32px; line-height: 1.6; }
-
-    .auth-code-display { display: flex; gap: 10px; margin-bottom: 24px; }
-
-    .auth-digit {
-      width: 48px; height: 56px;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      font-size: 28px; font-weight: 700;
-      text-align: center; color: var(--text);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      font-family: 'SF Mono', 'Courier New', monospace;
-    }
-
-    .auth-digit:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-    .auth-digit.filled { border-color: var(--accent); background: rgba(108, 99, 255, 0.1); }
-
-    .auth-error { color: var(--out); font-size: 13px; margin-bottom: 16px; min-height: 20px; }
-    .auth-btn {
-      background: var(--accent); border: none; color: white;
-      padding: 14px 36px; border-radius: 10px;
-      font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
-      transition: all 0.2s; width: 100%; max-width: 280px;
-    }
-    .auth-btn:hover { background: #5b54e0; box-shadow: 0 0 20px var(--accent-glow); }
-    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .auth-hint { margin-top: 24px; font-size: 12px; color: var(--text-dim); opacity: 0.6; }
-
-    /* ─── APP ─── */
-    .app-screen { display: none; }
-
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon {
-      width: 36px; height: 36px; background: var(--accent);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-    .subtitle { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-
-    .header-right { display: flex; align-items: center; gap: 12px; }
-
-    .lock-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
-      padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
-      font-family: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
-    }
-    .lock-btn:hover { border-color: var(--out); color: var(--out); }
-
-    .out-count {
-      background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
-      font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .out-count:hover { border-color: var(--accent); color: var(--text); }
-    .out-count.all-out { background: var(--in); border-color: var(--in); color: white; animation: pulse 1s ease-in-out; }
-
+    .out-count { background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; cursor:pointer; transition:all .2s; }
+    .out-count:hover { border-color:var(--accent); color:var(--text); }
+    .out-count.all-out { background:var(--in); border-color:var(--in); color:white; animation:pulse 1s ease-in-out; }
     @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
 
-    .search-wrap { position: relative; margin-bottom: 16px; }
-    .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
+    .search-wrap { position:relative; margin-bottom:12px; }
+    .search-wrap svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-dim); pointer-events:none; }
+    #search { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px 12px 42px; color:var(--text); font-size:15px; outline:none; transition:border-color .2s,box-shadow .2s; }
+    #search:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
 
-    #search {
-      width: 100%; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 14px 12px 42px;
-      color: var(--text); font-size: 15px; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    #search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    /* Bulk action bar */
+    .bulk-bar { display:none; background:var(--surface); border:1px solid var(--accent); border-radius:12px; padding:10px 14px; margin-bottom:12px; align-items:center; gap:10px; flex-wrap:wrap; }
+    .bulk-bar.visible { display:flex; }
+    .bulk-info { font-size:13px; color:var(--accent); font-weight:600; flex:1; }
+    .bulk-move-label { font-size:13px; color:var(--text-dim); }
+    .bulk-select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 10px; color:var(--text); font-size:13px; font-family:inherit; outline:none; cursor:pointer; }
+    .bulk-select:focus { border-color:var(--accent); }
+    .bulk-btn { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 14px; color:var(--text); font-size:13px; cursor:pointer; font-family:inherit; transition:all .2s; }
+    .bulk-btn:hover { border-color:var(--accent); color:var(--text); }
+    .bulk-btn.cancel { color:var(--text-dim); }
+    .bulk-btn.cancel:hover { border-color:var(--out); color:var(--out); }
 
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .filter-btn { background:var(--surface); border:1px solid var(--border); color:var(--text-dim); padding:7px 14px; border-radius:20px; font-size:13px; cursor:pointer; transition:all .2s; font-family:inherit; }
+    .filter-btn:hover { border-color:var(--accent); color:var(--text); }
+    .filter-btn.active { background:var(--accent); border-color:var(--accent); color:white; box-shadow:0 0 12px var(--accent-glow); }
+    .filter-btn .count { margin-left:5px; font-size:11px; opacity:0.7; }
 
-    .filter-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
-      padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer;
-      transition: all 0.2s; font-family: inherit;
-    }
-    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
-    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 0 12px var(--accent-glow); }
-    .filter-btn .count { margin-left: 5px; font-size: 11px; opacity: 0.7; }
+    .add-form { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .add-form input[type="text"] { flex:1; min-width:140px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-size:14px; font-family:inherit; outline:none; transition:border-color .2s; }
+    .add-form input[type="text"]:focus { border-color:var(--accent); }
+    .add-form select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-size:14px; font-family:inherit; outline:none; cursor:pointer; transition:border-color .2s; min-width:120px; }
+    .add-form select:focus { border-color:var(--accent); }
+    .add-btn { background:var(--accent); border:none; color:white; padding:10px 16px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap; }
+    .add-btn:hover { box-shadow:0 0 16px var(--accent-glow); }
+    .add-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-    .add-form {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px; margin-bottom: 20px;
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-    }
+    .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .sort-wrap { display:flex; align-items:center; gap:8px; }
+    .sort-label { font-size:13px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; }
+    .sort-select { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:5px 10px; color:var(--text); font-size:13px; font-family:inherit; outline:none; cursor:pointer; transition:border-color .2s; }
+    .sort-select:focus { border-color:var(--accent); }
+    .sort-select option { background:var(--surface2); }
+    .list-count { font-size:13px; color:var(--in); font-weight:700; }
 
-    .add-form input[type="text"] {
-      flex: 1; min-width: 160px; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 12px; color: var(--text);
-      font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
-    }
-    .add-form input[type="text"]:focus { border-color: var(--accent); }
+    .items { display:flex; flex-direction:column; gap:8px; }
+    .item { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all .3s; }
+    .item.out { border-color:var(--out); background:linear-gradient(90deg,var(--out-glow) 0%,var(--surface) 40%); }
+    .item.in { border-color:var(--in); background:linear-gradient(90deg,var(--in-glow) 0%,var(--surface) 40%); }
+    .item.selected { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
 
-    .add-form select {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 12px; color: var(--text);
-      font-size: 14px; font-family: inherit; outline: none; cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .add-form select:focus { border-color: var(--accent); }
+    /* Item checkbox for bulk select */
+    .item-check { width:20px; height:20px; border-radius:6px; border:2px solid var(--border); background:var(--surface2); flex-shrink:0; cursor:pointer; display:none; align-items:center; justify-content:center; transition:all .2s; }
+    .item-check.checked { background:var(--accent); border-color:var(--accent); }
+    .item-check.checked::after { content:'✓'; color:white; font-size:12px; font-weight:700; }
+    .bulk-mode .item-check { display:flex; }
 
-    .add-btn {
-      background: var(--accent); border: none; color: white;
-      padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;
-    }
-    .add-btn:hover { box-shadow: 0 0 16px var(--accent-glow); }
-    .add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .sort-wrap { display: flex; align-items: center; gap: 8px; }
-    .sort-label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    .sort-select {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 5px 10px; color: var(--text);
-      font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .sort-select:focus { border-color: var(--accent); }
-    .sort-select option { background: var(--surface2); color: var(--text); }
-    .list-count { font-size: 13px; color: var(--in); font-weight: 700; }
-
-    .items { display: flex; flex-direction: column; gap: 8px; }
-
-    .item {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 14px;
-      display: flex; align-items: center; gap: 10px;
-      transition: all 0.3s;
-    }
-
-    .item.out { border-color: var(--out); background: linear-gradient(90deg, var(--out-glow) 0%, var(--surface) 40%); }
-    .item.in { border-color: var(--in); background: linear-gradient(90deg, var(--in-glow) 0%, var(--surface) 40%); }
-
-    /* Thumbnail — replaces the old X button */
-    .item-thumb {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
-      flex-shrink: 0; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; transition: all 0.2s;
-    }
-    .item-thumb:hover { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-    .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .item-thumb .no-img { font-size: 18px; opacity: 0.4; }
-
-    .item-name { flex: 1; font-size: 15px; font-weight: 500; }
-
-    .item-zone {
-      font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: 600; flex-shrink: 0;
-    }
-    .item-zone.Kitchen { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
-    .item-zone.Bath { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-    .item-zone.Bedroom { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
-    .item-zone.Living { background: rgba(253, 224, 71, 0.15); color: #fde047; }
-    .item-zone.Dining { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
-    .item-zone.Office { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
-    .item-zone.Garage { background: var(--garage-glow); color: var(--garage); }
-    .item-zone.Storage { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+    .item-thumb { width:36px; height:36px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; overflow:hidden; transition:all .2s; }
+    .item-thumb:hover { border-color:var(--accent); box-shadow:0 0 8px var(--accent-glow); }
+    .item-thumb img { width:100%; height:100%; object-fit:cover; }
+    .item-thumb .no-img { font-size:18px; opacity:0.4; }
+    .item-name { flex:1; font-size:15px; font-weight:500; }
+    .item-zone { font-size:12px; padding:3px 10px; border-radius:12px; font-weight:600; flex-shrink:0; }
+    .item-zone.Kitchen{background:rgba(251,146,60,.15);color:#fb923c}
+    .item-zone.Bath{background:rgba(56,189,248,.15);color:#38bdf8}
+    .item-zone.Bedroom{background:rgba(167,139,250,.15);color:#a78bfa}
+    .item-zone.Living{background:rgba(253,224,71,.15);color:#fde047}
+    .item-zone.Dining{background:rgba(74,222,128,.15);color:#4ade80}
+    .item-zone.Office{background:rgba(99,102,241,.2);color:#818cf8}
+    .item-zone.Garage{background:var(--garage-glow);color:var(--garage)}
+    .item-zone.Storage{background:rgba(148,163,184,.15);color:#94a3b8}
+    .item-zone.Unassigned{background:rgba(239,68,68,.15);color:#f87171}
 
     /* Toggle */
-    .toggle { position: relative; width: 56px; height: 28px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-track {
-      position: absolute; inset: 0;
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 28px;
-      cursor: pointer; transition: all 0.3s;
-    }
-    .toggle-track::after {
-      content: ''; position: absolute;
-      width: 20px; height: 20px; background: white; border-radius: 50%;
-      top: 3px; left: 3px; transition: all 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-    }
-    .toggle input:checked + .toggle-track { background: var(--out); border-color: var(--out); }
-    .toggle input:checked + .toggle-track::after { transform: translateX(28px); }
-    .toggle-label {
-      position: absolute; inset: 0; display: flex; align-items: center;
-      justify-content: center; font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
-      pointer-events: none; z-index: 1; transition: color 0.3s;
-    }
-    .toggle-label.out { color: white; }
-    .toggle-label.in { color: var(--text-dim); }
-    .toggle input:checked ~ .toggle-label.in { color: white; }
-    .toggle input:not(:checked) ~ .toggle-label.out { color: var(--text-dim); }
+    .toggle { position:relative; width:56px; height:28px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-track { position:absolute; inset:0; background:var(--surface2); border:1px solid var(--border); border-radius:28px; cursor:pointer; transition:all .3s; }
+    .toggle-track::after { content:''; position:absolute; width:20px; height:20px; background:white; border-radius:50%; top:3px; left:3px; transition:all .3s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+    .toggle input:checked+.toggle-track { background:var(--out); border-color:var(--out); }
+    .toggle input:checked+.toggle-track::after { transform:translateX(28px); }
+    .toggle-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; letter-spacing:.5px; pointer-events:none; z-index:1; transition:color .3s; }
+    .toggle-label.out { color:white; }
+    .toggle-label.in { color:var(--text-dim); }
+    .toggle input:checked~.toggle-label.in { color:white; }
+    .toggle input:not(:checked)~.toggle-label.out { color:var(--text-dim); }
 
-    /* Empty */
-    .empty { text-align: center; padding: 48px 20px; color: var(--text-dim); }
-    .empty-icon { font-size: 42px; margin-bottom: 12px; }
-    .empty p { font-size: 15px; line-height: 1.6; }
+    .empty { text-align:center; padding:48px 20px; color:var(--text-dim); }
+    .empty-icon { font-size:42px; margin-bottom:12px; }
+    .empty p { font-size:15px; line-height:1.6; }
+    .footer { margin-top:32px; text-align:center; font-size:12px; color:var(--text-dim); opacity:0.5; }
 
-    .footer { margin-top: 32px; text-align: center; font-size: 12px; color: var(--text-dim); opacity: 0.5; }
+    /* MODAL */
+    .modal-overlay { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.75); align-items:center; justify-content:center; padding:20px; }
+    .modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; width:100%; max-width:380px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); max-height:90vh; overflow-y:auto; }
+    .modal-img-area { width:100%; height:260px; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; position:relative; overflow:hidden; }
+    .modal-img-area img { max-width:100%; max-height:100%; object-fit:contain; }
+    .modal-placeholder { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-dim); font-size:13px; text-align:center; padding:20px; }
+    .modal-placeholder-icon { font-size:40px; opacity:0.3; }
+    .modal-close-x { position:absolute; top:10px; right:12px; background:rgba(0,0,0,.5); border:none; color:white; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s; }
+    .modal-close-x:hover { background:rgba(0,0,0,.8); }
+    .upload-status { font-size:11px; color:var(--text-dim); text-align:center; min-height:16px; padding:0 16px; }
+    .upload-status.error { color:var(--out); }
+    .upload-status.ok { color:var(--in); }
+    .modal-item-name { padding:12px 16px; border-bottom:1px solid var(--border); font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .modal-menu { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .modal-zone-row { display:flex; align-items:center; gap:8px; }
+    .modal-zone-label { font-size:13px; color:var(--text-dim); flex-shrink:0; }
+    .modal-zone-select { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:13px; font-family:inherit; outline:none; cursor:pointer; transition:border-color .2s; }
+    .modal-zone-select:focus { border-color:var(--accent); }
+    .modal-action-row { display:flex; gap:8px; }
+    .photo-btn { width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-family:inherit; line-height:1; }
+    .photo-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .photo-btn.delete:hover { border-color:var(--out); color:var(--out); }
+    .photo-btn.delete { font-size:16px; }
+    #photoInput { display:none; }
+    .modal-action-btn { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--text); font-size:13px; cursor:pointer; font-family:inherit; transition:all .2s; text-align:center; }
+    .modal-action-btn:hover { border-color:var(--accent); color:var(--text); }
+    .modal-action-btn.danger { color:var(--out); }
+    .modal-action-btn.danger:hover { background:var(--out-glow); border-color:var(--out); }
+    .modal-action-btn.close-btn { margin-top:4px; background:var(--accent); border-color:var(--accent); color:white; font-weight:600; }
+    .modal-action-btn.close-btn:hover { background:#5b54e0; }
 
-    /* ─── MODAL ─── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 100;
-      background: rgba(0,0,0,0.75);
-      align-items: center; justify-content: center;
-      padding: 20px;
-    }
+    /* ZONES EDITOR MODAL */
+    .zones-modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; width:100%; max-width:380px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+    .zones-modal-header { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .zones-modal-title { font-size:16px; font-weight:700; }
+    .zones-modal-close { background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; padding:4px; border-radius:6px; transition:all .2s; }
+    .zones-modal-close:hover { color:var(--text); background:var(--surface2); }
+    .zones-list { padding:8px; max-height:300px; overflow-y:auto; }
+    .zone-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; transition:background .2s; }
+    .zone-row:hover { background:var(--surface2); }
+    .zone-row .zone-name { flex:1; font-size:14px; }
+    .zone-row .zone-name-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:6px 10px; color:var(--text); font-size:14px; font-family:inherit; outline:none; }
+    .zone-row .zone-name-input:focus { border-color:var(--accent); }
+    .zone-edit-btn { background:none; border:none; color:var(--text-dim); font-size:14px; cursor:pointer; padding:4px 6px; border-radius:4px; transition:all .2s; }
+    .zone-edit-btn:hover { color:var(--accent); background:var(--surface2); }
+    .zone-del-btn { background:none; border:none; color:var(--text-dim); font-size:14px; cursor:pointer; padding:4px 6px; border-radius:4px; transition:all .2s; }
+    .zone-del-btn:hover { color:var(--out); background:var(--out-glow); }
+    .zone-save-btn { background:var(--accent); border:none; color:white; font-size:12px; font-weight:600; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:inherit; transition:all .2s; }
+    .zone-save-btn:hover { background:#5b54e0; }
+    .zone-cancel-btn { background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); font-size:12px; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:inherit; transition:all .2s; }
+    .zone-cancel-btn:hover { color:var(--text); }
+    .zones-add-row { display:flex; gap:8px; padding:8px 10px; border-top:1px solid var(--border); margin-top:4px; }
+    .zones-add-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:14px; font-family:inherit; outline:none; transition:border-color .2s; }
+    .zones-add-input:focus { border-color:var(--accent); }
+    .zones-add-input::placeholder { color:var(--text-dim); }
+    .zones-add-btn { background:var(--accent); border:none; color:white; font-size:14px; font-weight:600; padding:8px 14px; border-radius:8px; cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap; }
+    .zones-add-btn:hover { background:#5b54e0; }
+    .zones-add-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      width: 100%; max-width: 380px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
+    .loading { text-align:center; padding:48px 20px; color:var(--text-dim); }
+    .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
 
-    .modal-img-area {
-      width: 100%; height: 280px;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px;
-      position: relative; overflow: hidden;
-    }
-
-    .modal-img-area img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-    .modal-placeholder {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: var(--text-dim); font-size: 13px; text-align: center; padding: 20px;
-    }
-
-    .modal-placeholder-icon { font-size: 40px; opacity: 0.3; }
-
-    /* Photo controls */
-    .photo-controls {
-      display: flex; align-items: center; gap: 10px;
-    }
-
-    .photo-btn {
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 1px solid var(--border); background: var(--surface2);
-      color: var(--text); font-size: 20px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; font-family: inherit; line-height: 1;
-    }
-
-    .photo-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .photo-btn.delete:hover { border-color: var(--out); color: var(--out); }
-    .photo-btn.delete { font-size: 16px; }
-
-    /* File input (hidden) */
-    #photoInput { display: none; }
-
-    /* Upload progress */
-    .upload-status {
-      font-size: 11px; color: var(--text-dim); text-align: center;
-      min-height: 16px;
-    }
-    .upload-status.error { color: var(--out); }
-    .upload-status.ok { color: var(--in); }
-
-    .modal-item-name {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 15px; font-weight: 600; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    .modal-menu {
-      padding: 12px 16px;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-
-    .modal-zone-row {
-      display: flex; align-items: center; gap: 8px;
-    }
-
-    .modal-zone-label {
-      font-size: 13px; color: var(--text-dim); flex-shrink: 0;
-    }
-
-    .modal-zone-select {
-      flex: 1; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px 10px; color: var(--text);
-      font-size: 13px; font-family: inherit; outline: none;
-      cursor: pointer; transition: border-color 0.2s;
-    }
-    .modal-zone-select:focus { border-color: var(--accent); }
-
-    .modal-action-row {
-      display: flex; gap: 8px;
-    }
-
-    .modal-action-btn {
-      flex: 1; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px; color: var(--text);
-      font-size: 13px; cursor: pointer; font-family: inherit;
-      transition: all 0.2s; text-align: center;
-    }
-
-    .modal-action-btn:hover { border-color: var(--accent); color: var(--text); }
-    .modal-action-btn.danger { color: var(--out); }
-    .modal-action-btn.danger:hover { background: var(--out-glow); border-color: var(--out); }
-    .modal-action-btn.close-btn { margin-top: 4px; background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
-    .modal-action-btn.close-btn:hover { background: #5b54e0; }
-
-    .modal-close-x {
-      position: absolute; top: 10px; right: 12px;
-      background: rgba(0,0,0,0.5); border: none; color: white;
-      width: 28px; height: 28px; border-radius: 50%;
-      font-size: 16px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    .modal-close-x:hover { background: rgba(0,0,0,0.8); }
-
-    /* Loading overlay */
-    .loading { text-align: center; padding: 48px 20px; color: var(--text-dim); }
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--border); border-top-color: var(--accent);
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Mobile */
-    @media (max-width: 500px) {
-      body { padding: 14px; }
-      .item { padding: 10px 12px; }
-      .item-zone { display: none; }
-      .add-form select { min-width: 100%; }
-      .modal-img-area { height: 220px; }
+    @media (max-width:500px) {
+      body { padding:14px; }
+      .item { padding:10px 12px; }
+      .item-zone { display:none; }
+      .add-form select { min-width:100%; }
+      .modal-img-area { height:200px; }
     }
   </style>
 </head>
@@ -417,35 +237,34 @@
   <header>
     <div class="logo">
       <div class="logo-icon">📦</div>
-      <div><h1>PackTrack</h1><div class="subtitle">Housesit Inventory</div></div>
+      <div><h1>PackTrack</h1><div class="subtitle" id="headerLocation">—</div></div>
     </div>
     <div class="header-right">
-      <button class="lock-btn" onclick="lock()">🔒 Lock</button>
-      <div class="out-count" id="outCount" onclick="markAllOut()"><span id="countLabel">0 IN</span></div>
+      <button class="hdr-btn" id="selectBtn" onclick="toggleBulkMode()">☐ Select</button>
+      <button class="hdr-btn" id="zonesBtn" onclick="openZonesModal()">📍 Zones</button>
+      <button class="hdr-btn" id="lockBtn" onclick="lock()">🔒</button>
+      <div class="out-count" id="outCount" onclick="markAllOut()"><span id="countLabel">0</span></div>
     </div>
   </header>
 
   <div class="search-wrap">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-    </svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <input type="text" id="search" placeholder="Search items..." oninput="render()">
+  </div>
+
+  <div class="bulk-bar" id="bulkBar">
+    <span class="bulk-info" id="bulkInfo">0 selected</span>
+    <span class="bulk-move-label">Move to:</span>
+    <select class="bulk-select" id="bulkZoneSelect"></select>
+    <button class="bulk-btn" onclick="bulkMove()">Move</button>
+    <button class="bulk-btn cancel" onclick="toggleBulkMode()">Cancel</button>
   </div>
 
   <div class="filters" id="filters"></div>
 
   <div class="add-form">
     <input type="text" id="newName" placeholder="Item name..." onkeydown="if(event.key==='Enter')addItem()">
-    <select id="newZone">
-      <option value="Kitchen">Kitchen</option>
-      <option value="Bath">Bath</option>
-      <option value="Bedroom">Bedroom</option>
-      <option value="Living">Living Room</option>
-      <option value="Dining">Dining Room</option>
-      <option value="Office" selected>Office</option>
-      <option value="Garage">Garage</option>
-      <option value="Storage">Storage</option>
-    </select>
+    <select id="newZone"></select>
     <button class="add-btn" id="addBtn" onclick="addItem()">Add</button>
   </div>
 
@@ -453,7 +272,7 @@
     <div class="sort-wrap">
       <span class="sort-label">Sort:</span>
       <select id="sortSelect" class="sort-select" onchange="setSortMode(this.value)">
-        <option value="room">By Room</option>
+        <option value="room">By Zone</option>
         <option value="az">A → Z</option>
         <option value="za">Z → A</option>
         <option value="in">IN Items</option>
@@ -467,12 +286,11 @@
   <div class="footer">Data synced with Nextcloud · smartconfigurations.com</div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+<!-- ITEM MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===document.getElementById('modalOverlay'))closeModal()">
   <div class="modal">
     <div class="modal-img-area" id="modalImgArea">
       <button class="modal-close-x" onclick="closeModal()">×</button>
-      <!-- image or placeholder injected here -->
     </div>
     <div class="upload-status" id="uploadStatus"></div>
     <div class="modal-item-name" id="modalItemName"></div>
@@ -490,32 +308,47 @@
   </div>
 </div>
 
-<!-- Hidden file input -->
+<!-- ZONES EDITOR MODAL -->
+<div class="modal-overlay" id="zonesModalOverlay" onclick="if(event.target===document.getElementById('zonesModalOverlay'))closeZonesModal()">
+  <div class="zones-modal">
+    <div class="zones-modal-header">
+      <span class="zones-modal-title">📍 Edit Zones</span>
+      <button class="zones-modal-close" onclick="closeZonesModal()">×</button>
+    </div>
+    <div class="zones-list" id="zonesList"></div>
+    <div class="zones-add-row">
+      <input type="text" class="zones-add-input" id="newZoneInput" placeholder="Add new zone..." onkeydown="if(event.key==='Enter')addZone()">
+      <button class="zones-add-btn" id="addZoneBtn" onclick="addZone()">Add</button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
 
 <script>
-const ZONES = ['Kitchen','Bath','Bedroom','Living','Dining','Office','Garage','Storage'];
 const WEBDAV_BASE = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packtrack_images';
-const WEBDAV_URL = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packlist.json';
+const WEBDAV_URL  = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/packlist.json';
 const WEBDAV_CODE_URL = 'https://smartconfigurations.com/nextcloud/remote.php/dav/files/ow9cg/.packtrack_pin.json';
 const CREDENTIALS = btoa('ow9cg:k9KE?6a7m%66I');
 
-let items = [];
+let data = { locations: [], items: [] };
 let activeZone = 'All';
-let sortMode = 'room'; // 'room' | 'az' | 'za' | 'in' | 'out'
+let sortMode = 'room';
 let code = '';
 let mode = 'check';
 let locked = true;
+let bulkMode = false;
+let selected = new Set();
 let currentItemId = null;
-let selectedZone = null;
+let editingZone = null; // zone name being edited
 
 const digits = document.querySelectorAll('.auth-digit');
 
-// ─── AUTH ───────────────────────────────────────────────────────────────
+// ─── AUTH ─────────────────────────────────────────────────────────────────
 async function initAuth() {
   try {
-    const resp = await fetch(WEBDAV_CODE_URL, { headers: { 'Authorization': 'Basic ' + CREDENTIALS } });
-    if (resp.ok) { const d = await resp.json(); code = d.code || ''; }
+    const r = await fetch(WEBDAV_CODE_URL, {headers:{'Authorization':'Basic '+CREDENTIALS}});
+    if (r.ok) { const d = await r.json(); code = d.code||''; }
   } catch(e) {}
   if (code) {
     mode = 'check';
@@ -539,7 +372,7 @@ async function handleAuth() {
     if (entered.length < 6) { showError('Please enter all 6 digits'); return; }
     code = entered;
     try {
-      await fetch(WEBDAV_CODE_URL, { method: 'PUT', headers: { 'Authorization': 'Basic ' + CREDENTIALS, 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+      await fetch(WEBDAV_CODE_URL, {method:'PUT',headers:{'Authorization':'Basic '+CREDENTIALS,'Content-Type':'application/json'},body:JSON.stringify({code})});
     } catch(e) {}
     unlock();
   } else {
@@ -548,76 +381,83 @@ async function handleAuth() {
   }
 }
 
-function getEnteredCode() { return Array.from(digits).map(d => d.value).join(''); }
-function clearCode() {
-  digits.forEach(d => { d.value = ''; d.classList.remove('filled'); });
-  digits[0].focus(); updateBtn();
-}
-function showError(msg) {
-  const el = document.getElementById('authError'); el.textContent = msg;
-  setTimeout(() => { el.textContent = ''; }, 2500);
-}
-function updateBtn() {
-  const entered = getEnteredCode();
-  document.getElementById('authBtn').disabled = (mode === 'setup' && entered.length < 6);
-}
-function unlock() {
-  locked = false;
-  document.getElementById('authScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'block';
-  load();
-}
+function getEnteredCode() { return Array.from(digits).map(d=>d.value).join(''); }
+function clearCode() { digits.forEach(d=>{d.value='';d.classList.remove('filled');}); digits[0].focus(); updateBtn(); }
+function showError(msg) { const el=document.getElementById('authError'); el.textContent=msg; setTimeout(()=>{el.textContent='';},2500); }
+function updateBtn() { document.getElementById('authBtn').disabled = (mode==='setup' && getEnteredCode().length < 6); }
+function unlock() { locked=false; document.getElementById('authScreen').style.display='none'; document.getElementById('appScreen').style.display='block'; load(); }
 
-digits.forEach((digit, idx) => {
-  digit.addEventListener('input', () => {
-    digit.value = digit.value.replace(/[^0-9]/g, '');
-    if (digit.value) { digit.classList.add('filled'); if (idx < 5) digits[idx+1].focus(); }
+digits.forEach((digit,idx)=>{
+  digit.addEventListener('input',()=>{
+    digit.value=digit.value.replace(/[^0-9]/g,'');
+    if(digit.value){digit.classList.add('filled');if(idx<5)digits[idx+1].focus();}
     updateBtn();
-    if (mode === 'check' && getEnteredCode().length === 6) handleAuth();
+    if(mode==='check'&&getEnteredCode().length===6)handleAuth();
   });
-  digit.addEventListener('keydown', e => {
-    if (e.key === 'Backspace' && !digit.value && idx > 0) {
-      digits[idx-1].focus(); digits[idx-1].value = ''; digits[idx-1].classList.remove('filled');
-    }
+  digit.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!digit.value&&idx>0){digits[idx-1].focus();digits[idx-1].value='';digits[idx-1].classList.remove('filled');}
   });
-  digit.addEventListener('paste', e => {
+  digit.addEventListener('paste',e=>{
     e.preventDefault();
-    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-    paste.split('').forEach((ch,i) => { if (digits[i]) { digits[i].value = ch; digits[i].classList.add('filled'); } });
-    if (paste.length >= 6) { digits[5].focus(); updateBtn(); } else { digits[paste.length]?.focus(); updateBtn(); }
+    const paste=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    paste.split('').forEach((ch,i)=>{if(digits[i]){digits[i].value=ch;digits[i].classList.add('filled');}});
+    if(paste.length>=6){digits[5].focus();updateBtn();}else{digits[paste.length]?.focus();updateBtn();}
   });
 });
 
 function lock() {
-  locked = true; clearCode();
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('authScreen').style.display = 'flex';
-  mode = 'check';
-  document.getElementById('authSubtitle').textContent = 'Enter your shared passcode\nto access your inventory';
-  document.getElementById('authBtn').textContent = 'Unlock';
-  document.getElementById('authHint').innerHTML = '';
+  locked=true; clearCode(); selected.clear(); bulkMode=false;
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+  mode='check';
+  document.getElementById('authSubtitle').textContent='Enter your shared passcode\nto access your inventory';
+  document.getElementById('authBtn').textContent='Unlock';
+  document.getElementById('authHint').innerHTML='';
   updateBtn();
+  refreshBulkUI();
 }
 
-// ─── DATA ───────────────────────────────────────────────────────────────
+// ─── DATA ──────────────────────────────────────────────────────────────────
 async function load() {
+  // Ensure default zones on first run
+  const defaults = ['Kitchen','Bath','Bedroom','Living Room','Dining Room','Office','Garage','Storage'];
   try {
-    const resp = await fetch(WEBDAV_URL, { headers: { 'Authorization': 'Basic ' + CREDENTIALS } });
-    if (resp.ok) { const data = await resp.json(); items = data.items || []; }
-    else if (resp.status === 404) { items = []; }
-    else throw new Error('HTTP ' + resp.status);
+    const resp = await fetch(WEBDAV_URL, {headers:{'Authorization':'Basic '+CREDENTIALS}});
+    if (resp.ok) {
+      const d = await resp.json();
+      data.locations = (d.locations && d.locations.length) ? d.locations : defaults;
+      data.items = d.items || [];
+    } else if (resp.status === 404) {
+      data.locations = defaults;
+      data.items = [];
+    } else { throw new Error('HTTP '+resp.status); }
   } catch(e) {
-    try { items = JSON.parse(localStorage.getItem('packtrack_items') || '[]'); } catch { items = []; }
+    data.locations = JSON.parse(localStorage.getItem('pt_locs')||'null')||defaults;
+    data.items = JSON.parse(localStorage.getItem('pt_items')||'null')||[];
   }
+  // Ensure all items have a valid zone
+  data.items.forEach(i=>{ if (!data.locations.includes(i.zone)) i.zone='Unassigned'; });
+  buildZoneSelects();
   render();
 }
 
 async function save() {
+  const payload = JSON.stringify(data, null, 2);
   try {
-    const payload = JSON.stringify({ items }, null, 2);
-    await fetch(WEBDAV_URL, { method: 'PUT', headers: { 'Authorization': 'Basic ' + CREDENTIALS, 'Content-Type': 'application/json' }, body: payload });
-    localStorage.setItem('packtrack_items', payload);
-  } catch(e) { localStorage.setItem('packtrack_items', JSON.stringify({ items })); }
+    await fetch(WEBDAV_URL, {method:'PUT',headers:{'Authorization':'Basic '+CREDENTIALS,'Content-Type':'application/json'},body:payload});
+    localStorage.setItem('pt_locs', JSON.stringify(data.locations));
+    localStorage.setItem('pt_items', JSON.stringify(data.items));
+  } catch(e) {
+    localStorage.setItem('pt_locs', JSON.stringify(data.locations));
+    localStorage.setItem('pt_items', JSON.stringify(data.items));
+  }
+}
+
+function buildZoneSelects() {
+  const opts = data.locations.map(z=>`<option value="${z}">${z}</option>`).join('');
+  document.getElementById('newZone').innerHTML = opts;
+  document.getElementById('bulkZoneSelect').innerHTML = opts;
+  document.getElementById('modalZoneSelect').innerHTML = opts;
 }
 
 async function addItem() {
@@ -625,7 +465,7 @@ async function addItem() {
   const zone = document.getElementById('newZone').value;
   if (!name) return;
   document.getElementById('addBtn').disabled = true;
-  items.push({ id: Date.now(), name, zone, packed: false });
+  data.items.push({id:Date.now(), name, zone, packed:false, hasImage:false});
   document.getElementById('newName').value = '';
   document.getElementById('newName').focus();
   await save(); render();
@@ -633,209 +473,222 @@ async function addItem() {
 }
 
 async function toggle(id) {
-  const item = items.find(i => i.id === id);
-  if (item) { item.packed = !item.packed; await save(); render(); }
+  const item = data.items.find(i=>i.id===id);
+  if (item) { item.packed=!item.packed; await save(); render(); }
 }
 
-function setZone(z) { activeZone = z; render(); }
-function setSortMode(m) { sortMode = m; render(); }
+function setZone(z) { activeZone=z; render(); }
+function setSortMode(m) { sortMode=m; render(); }
 
 async function markAllOut() {
-  const allIn = items.filter(i => !i.packed).length === 0 && items.length > 0;
-  if (allIn) { items.forEach(i => i.packed = false); document.getElementById('outCount').classList.remove('all-out'); }
-  else { items.forEach(i => i.packed = true); document.getElementById('outCount').classList.add('all-out'); setTimeout(() => document.getElementById('outCount').classList.remove('all-out'), 600); }
+  const allIn = data.items.filter(i=>!i.packed).length===0 && data.items.length>0;
+  if (allIn) { data.items.forEach(i=>i.packed=false); document.getElementById('outCount').classList.remove('all-out'); }
+  else { data.items.forEach(i=>i.packed=true); document.getElementById('outCount').classList.add('all-out'); setTimeout(()=>document.getElementById('outCount').classList.remove('all-out'),600); }
   await save(); render();
 }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-function render() {
-  if (locked) return;
-  const search = document.getElementById('search').value.toLowerCase();
-  const zoneCounts = {}; ZONES.forEach(z => zoneCounts[z] = 0);
-  items.forEach(i => { if (i.zone in zoneCounts) zoneCounts[i.zone]++; });
-
-  // Filter by zone AND search
-  let shown = items.filter(i => {
-    const mZ = activeZone === 'All' || i.zone === activeZone;
-    const mS = !search || i.name.toLowerCase().includes(search);
-    return mZ && mS;
-  });
-
-  // Apply sort mode
-  if (sortMode === 'az') {
-    shown.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (sortMode === 'za') {
-    shown.sort((a, b) => b.name.localeCompare(a.name));
-  } else if (sortMode === 'room') {
-    shown.sort((a, b) => ZONES.indexOf(a.zone) - ZONES.indexOf(b.zone));
-  } else if (sortMode === 'in') {
-    shown = shown.filter(i => !i.packed);
-  } else if (sortMode === 'out') {
-    shown = shown.filter(i => i.packed);
-  }
-
-  // Zone filter pills — show counts relative to current sortMode context
-  const filtersHtml = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="count">${items.length}</span></button>`;
-  document.getElementById('filters').innerHTML = filtersHtml + ZONES.map(z => {
-    const cnt = items.filter(i => i.zone === z).length;
-    if (cnt === 0 && activeZone !== z) return '';
-    return `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${z}')">${z}<span class="count">${cnt}</span></button>`;
-  }).join('');
-
-  // Right side: IN count (always total IN items, not filtered)
-  const inCount = items.filter(i => !i.packed).length;
-  const outCount = items.length - inCount;
-  const listCountEl = document.getElementById('listCount');
-  if (items.length === 0) {
-    listCountEl.textContent = '';
-  } else if (inCount === 0) {
-    listCountEl.textContent = '✓ ALL PACKED';
-    listCountEl.style.color = 'var(--in)';
-  } else {
-    listCountEl.textContent = `${inCount} to go`;
-    listCountEl.style.color = 'var(--in)';
-  }
-
-  if (shown.length === 0) {
-    const msg = sortMode === 'in' ? 'No items packed IN yet' :
-                sortMode === 'out' ? 'No items packed OUT yet' :
-                items.length === 0 ? 'Your pack list is empty.\nAdd your first item above.' :
-                'No items match';
-    document.getElementById('items').innerHTML = `<div class="empty"><div class="empty-icon">🧳</div><p>${msg.replace(/\n/g,'<br>')}</p></div>`;
-    return;
-  }
-
-  document.getElementById('items').innerHTML = shown.map(i => `
-    <div class="item ${i.packed ? 'out' : 'in'}">
-      <div class="item-thumb" onclick="openModal(${i.id})" title="${esc(i.name)}">
-        ${i.hasImage ? `<img src="${WEBDAV_BASE}/${i.id}.jpg?cb=${Date.now()}" onerror="this.parentElement.innerHTML='<span class=no-img>📷</span>'" alt="${esc(i.name)}">` : '<span class=no-img>📷</span>'}
-      </div>
-      <div class="item-name">${esc(i.name)}</div>
-      <span class="item-zone ${i.zone}">${i.zone}</span>
-      <label class="toggle">
-        <input type="checkbox" ${i.packed ? 'checked' : ''} onchange="toggle(${i.id})">
-        <div class="toggle-track"></div>
-        <div class="toggle-label out">OUT</div>
-        <div class="toggle-label in">IN</div>
-      </label>
-    </div>`).join('');
+// ─── BULK MODE ─────────────────────────────────────────────────────────────
+function toggleBulkMode() {
+  bulkMode = !bulkMode;
+  selected.clear();
+  refreshBulkUI();
+  render();
 }
 
-// ─── MODAL ───────────────────────────────────────────────────────────────
+function refreshBulkUI() {
+  const bar = document.getElementById('bulkBar');
+  const selBtn = document.getElementById('selectBtn');
+  if (bulkMode) {
+    bar.classList.add('visible');
+    selBtn.classList.add('active');
+    selBtn.textContent = '☐ Select';
+    document.getElementById('appScreen').classList.add('bulk-mode');
+  } else {
+    bar.classList.remove('visible');
+    selBtn.classList.remove('active');
+    selBtn.textContent = '☐ Select';
+    document.getElementById('appScreen').classList.remove('bulk-mode');
+  }
+}
+
+function toggleSelect(id) {
+  if (selected.has(id)) selected.delete(id);
+  else selected.add(id);
+  const n = selected.size;
+  document.getElementById('bulkInfo').textContent = n===0 ? 'None selected' : `${n} selected`;
+  render();
+}
+
+async function bulkMove() {
+  const targetZone = document.getElementById('bulkZoneSelect').value;
+  if (!targetZone || selected.size===0) return;
+  selected.forEach(id => {
+    const item = data.items.find(i=>i.id===id);
+    if (item) item.zone = targetZone;
+  });
+  await save();
+  selected.clear();
+  document.getElementById('bulkInfo').textContent = 'None selected';
+  render();
+}
+
+// ─── ZONES EDITOR ─────────────────────────────────────────────────────────
+function openZonesModal() {
+  editingZone = null;
+  renderZonesList();
+  document.getElementById('zonesModalOverlay').style.display = 'flex';
+  document.getElementById('newZoneInput').value = '';
+  document.getElementById('newZoneInput').focus();
+}
+
+function closeZonesModal() {
+  document.getElementById('zonesModalOverlay').style.display = 'none';
+  editingZone = null;
+}
+
+function renderZonesList() {
+  const list = document.getElementById('zonesList');
+  list.innerHTML = data.locations.map(z => {
+    if (editingZone === z) {
+      return `<div class="zone-row">
+        <input type="text" class="zone-name-input" id="zoneEditInput" value="${esc(z)}" onkeydown="if(event.key==='Enter')saveZoneEdit()">
+        <button class="zone-save-btn" onclick="saveZoneEdit()">Save</button>
+        <button class="zone-cancel-btn" onclick="cancelZoneEdit()">✕</button>
+      </div>`;
+    } else {
+      const itemCount = data.items.filter(i=>i.zone===z).length;
+      return `<div class="zone-row">
+        <span class="zone-name">${esc(z)} <span style="opacity:0.5;font-size:12px">(${itemCount})</span></span>
+        <button class="zone-edit-btn" onclick="startEditZone('${escAttr(z)}')">✎</button>
+        <button class="zone-del-btn" onclick="deleteZone('${escAttr(z)}')">×</button>
+      </div>`;
+    }
+  }).join('');
+}
+
+function startEditZone(z) {
+  editingZone = z;
+  renderZonesList();
+  setTimeout(()=>{ const inp = document.getElementById('zoneEditInput'); if(inp) { inp.focus(); inp.value = z; } }, 10);
+}
+
+function cancelZoneEdit() {
+  editingZone = null;
+  renderZonesList();
+}
+
+function saveZoneEdit() {
+  const input = document.getElementById('zoneEditInput');
+  if (!input) return;
+  const newName = input.value.trim();
+  if (!newName || newName === editingZone) { cancelZoneEdit(); return; }
+  if (data.locations.includes(newName)) { alert('Zone already exists'); return; }
+  const oldName = editingZone;
+  data.locations = data.locations.map(z=>z===oldName?newName:z);
+  data.items.forEach(i=>{ if(i.zone===oldName) i.zone=newName; });
+  editingZone = null;
+  buildZoneSelects();
+  await save();
+  renderZonesList();
+  render();
+}
+
+async function deleteZone(z) {
+  const count = data.items.filter(i=>i.zone===z).length;
+  const msg = count > 0
+    ? `Delete "${z}"? ${count} item${count>1?'s':''} will become Unassigned.`
+    : `Delete zone "${z}"?`;
+  if (!confirm(msg)) return;
+  data.locations = data.locations.filter(loc=>loc!==z);
+  data.items.forEach(i=>{ if(i.zone===z) i.zone='Unassigned'; });
+  buildZoneSelects();
+  await save();
+  renderZonesList();
+  render();
+}
+
+async function addZone() {
+  const input = document.getElementById('newZoneInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (data.locations.map(z=>z.toLowerCase()).includes(name.toLowerCase())) { alert('Zone already exists'); return; }
+  document.getElementById('addZoneBtn').disabled = true;
+  data.locations.push(name);
+  buildZoneSelects();
+  input.value = '';
+  await save();
+  renderZonesList();
+  render();
+  document.getElementById('addZoneBtn').disabled = false;
+}
+
+// ─── ITEM MODAL ────────────────────────────────────────────────────────────
 function openModal(id) {
   currentItemId = id;
-  const item = items.find(i => i.id === id);
+  const item = data.items.find(i=>i.id===id);
   if (!item) return;
-
-  selectedZone = item.zone;
-
-  // Zone select
-  document.getElementById('modalZoneSelect').innerHTML = ZONES.map(z => `<option value="${z}"${z === item.zone ? ' selected' : ''}>${z}</option>`).join('');
-
-  // Item name
+  document.getElementById('modalZoneSelect').value = item.zone;
   document.getElementById('modalItemName').textContent = item.name;
-
-  // Image
-  const imgArea = document.getElementById('modalImgArea');
-  const closeBtn = imgArea.querySelector('.modal-close-x');
-  if (closeBtn) closeBtn.remove();
-
-  if (item.hasImage) {
-    imgArea.innerHTML = `
-      <button class="modal-close-x" onclick="closeModal()">×</button>
-      <img src="${WEBDAV_BASE}/${id}.jpg?cb=${Date.now()}" alt="${esc(item.name)}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
-  } else {
-    imgArea.innerHTML = `
-      <button class="modal-close-x" onclick="closeModal()">×</button>
-      <div class="modal-placeholder">
-        <div class="modal-placeholder-icon">📷</div>
-        <div>No photo yet</div>
-        <div style="font-size:12px;opacity:0.6;">Tap + to add one</div>
-      </div>`;
-  }
-
   document.getElementById('uploadStatus').textContent = '';
+  const imgArea = document.getElementById('modalImgArea');
+  imgArea.innerHTML = `<button class="modal-close-x" onclick="closeModal()">×</button>`;
+  if (item.hasImage) {
+    imgArea.innerHTML += `<img src="${WEBDAV_BASE}/${id}.jpg?cb=${Date.now()}" alt="${esc(item.name)}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+  } else {
+    imgArea.innerHTML += `<div class="modal-placeholder"><div class="modal-placeholder-icon">📷</div><div>No photo</div><div style="font-size:12px;opacity:0.6;">Tap + to add</div></div>`;
+  }
   document.getElementById('modalOverlay').style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').style.display = 'none';
-  currentItemId = null;
-}
-
-function closeModalOnOverlay(e) {
-  if (e.target.id === 'modalOverlay') closeModal();
-}
+function closeModal() { document.getElementById('modalOverlay').style.display='none'; currentItemId=null; }
 
 async function saveModalAndClose() {
-  if (currentItemId === null) return;
-  const item = items.find(i => i.id === currentItemId);
+  if (currentItemId===null) return;
+  const item = data.items.find(i=>i.id===currentItemId);
   if (!item) { closeModal(); return; }
   const newZone = document.getElementById('modalZoneSelect').value;
-  if (newZone !== item.zone) {
-    item.zone = newZone;
-    await save();
-    render();
-  }
+  if (newZone !== item.zone) { item.zone=newZone; await save(); render(); }
   closeModal();
 }
 
 async function deleteItem() {
-  if (currentItemId === null) return;
+  if (currentItemId===null) return;
   if (!confirm('Delete this item? This cannot be undone.')) return;
   const id = currentItemId;
-  // Try to delete image from WebDAV
-  try {
-    await fetch(`${WEBDAV_BASE}/${id}.jpg`, { method: 'DELETE', headers: { 'Authorization': 'Basic ' + CREDENTIALS } });
-  } catch(e) {}
-  items = items.filter(i => i.id !== id);
+  try { await fetch(`${WEBDAV_BASE}/${id}.jpg`,{method:'DELETE',headers:{'Authorization':'Basic '+CREDENTIALS}}); } catch(e){}
+  data.items = data.items.filter(i=>i.id!==id);
   await save();
   render();
   closeModal();
 }
 
-// ─── PHOTO UPLOAD ─────────────────────────────────────────────────────────
+// ─── PHOTO ─────────────────────────────────────────────────────────────────
 async function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file || !currentItemId) return;
   const status = document.getElementById('uploadStatus');
-  status.textContent = 'Uploading...';
-  status.className = 'upload-status';
-
-  // Resize to max 800px before upload
+  status.textContent = 'Uploading...'; status.className = 'upload-status';
   const resized = await resizeImage(file, 800);
-  const blob = await new Promise(resolve => resized.toBlob(resolve, 'image/jpeg', 0.8));
-
+  const blob = await new Promise(r=>resized.toBlob(r,'image/jpeg',0.8));
   const formData = new FormData();
   formData.append('filename', String(currentItemId));
   formData.append('image', blob, 'photo.jpg');
-
   try {
-    const resp = await fetch('upload.php', {
-      method: 'POST',
-      body: formData
-    });
-    const data = await resp.json();
-    if (data.success) {
-      const item = items.find(i => i.id === currentItemId);
-      if (item) { item.hasImage = true; await save(); }
-      status.textContent = '✓ Uploaded';
-      status.className = 'upload-status ok';
-      setTimeout(() => { status.textContent = ''; }, 2000);
-      // Update modal image
+    const resp = await fetch('upload.php',{method:'POST',body:formData});
+    const d = await resp.json();
+    if (d.success) {
+      const item = data.items.find(i=>i.id===currentItemId);
+      if (item) { item.hasImage=true; await save(); }
+      status.textContent = '✓ Uploaded'; status.className = 'upload-status ok';
+      setTimeout(()=>{status.textContent='';},2000);
       const imgArea = document.getElementById('modalImgArea');
-      imgArea.innerHTML = `
-        <button class="modal-close-x" onclick="closeModal()">×</button>
-        <img src="${WEBDAV_BASE}/${currentItemId}.jpg?cb=${Date.now()}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+      imgArea.innerHTML = `<button class="modal-close-x" onclick="closeModal()">×</button><img src="${WEBDAV_BASE}/${currentItemId}.jpg?cb=${Date.now()}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">`;
       render();
-    } else {
-      throw new Error(data.error || 'Upload failed');
-    }
-  } catch(e) {
-    status.textContent = 'Upload failed — check connection';
-    status.className = 'upload-status error';
-  }
+    } else { throw new Error(d.error||'fail'); }
+  } catch(e) { status.textContent = 'Upload failed'; status.className = 'upload-status error'; }
   event.target.value = '';
 }
 
@@ -843,16 +696,87 @@ function resizeImage(file, maxDim) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(c);
+      const scale = Math.min(1, maxDim/Math.max(img.width,img.height));
+      const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h); resolve(c);
     };
     img.src = URL.createObjectURL(file);
   });
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+function render() {
+  if (locked) return;
+  const search = document.getElementById('search').value.toLowerCase();
+  const locCounts = {};
+  data.locations.forEach(z=>locCounts[z]=0);
+  data.items.forEach(i=>{ if(i.zone in locCounts) locCounts[i.zone]++; });
+
+  // Filters
+  const allCount = data.items.length;
+  let fh = `<button class="filter-btn${activeZone==='All'?' active':''}" onclick="setZone('All')">All<span class="count">${allCount}</span></button>`;
+  data.locations.forEach(z=>{
+    const cnt = locCounts[z]||0;
+    if (cnt>0 || activeZone===z) fh += `<button class="filter-btn${activeZone===z?' active':''}" onclick="setZone('${escAttr(z)}')">${esc(z)}<span class="count">${cnt}</span></button>`;
+  });
+  // Unassigned count
+  const uncount = data.items.filter(i=>i.zone==='Unassigned').length;
+  if (uncount > 0) fh += `<button class="filter-btn${activeZone==='Unassigned'?' active':''}" onclick="setZone('Unassigned')">Unassigned<span class="count">${uncount}</span></button>`;
+  document.getElementById('filters').innerHTML = fh;
+
+  // Filter
+  let shown = data.items.filter(i=>{
+    const mZ = activeZone==='All'||i.zone===activeZone;
+    const mS = !search||i.name.toLowerCase().includes(search);
+    return mZ&&mS;
+  });
+
+  // Sort
+  if (sortMode==='az') shown.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sortMode==='za') shown.sort((a,b)=>b.name.localeCompare(a.name));
+  else if (sortMode==='room') shown.sort((a,b)=>data.locations.indexOf(a.zone)-data.locations.indexOf(b.zone)||a.name.localeCompare(b.name));
+  else if (sortMode==='in') shown=shown.filter(i=>!i.packed);
+  else if (sortMode==='out') shown=shown.filter(i=>i.packed);
+
+  // Header location & count
+  const inCount = data.items.filter(i=>!i.packed).length;
+  const label = document.getElementById('countLabel');
+  if (data.items.length===0) { label.textContent='0'; label.style.color='var(--text-dim)'; }
+  else if (inCount===0) { label.textContent='✓'; label.style.color='var(--in)'; }
+  else { label.textContent=inCount; label.style.color='var(--in)'; }
+  document.getElementById('headerLocation').textContent = `${data.items.length} items`;
+
+  // Bulk zone select refresh
+  buildZoneSelects();
+
+  // List count
+  const listCountEl = document.getElementById('listCount');
+  if (data.items.length===0) { listCountEl.textContent=''; }
+  else if (inCount===0) { listCountEl.textContent='✓ ALL PACKED'; listCountEl.style.color='var(--in)'; }
+  else { listCountEl.textContent=`${inCount} to go`; listCountEl.style.color='var(--in)'; }
+
+  if (shown.length===0) {
+    const msgs = {in:'No items packed IN yet',out:'No items packed OUT yet','':data.items.length===0?"Your pack list is empty.\nAdd your first item above.":"No items match"};
+    document.getElementById('items').innerHTML = `<div class="empty"><div class="empty-icon">🧳</div><p>${(msgs[sortMode]||msgs['']).replace(/\n/g,'<br>')}</p></div>`;
+    return;
+  }
+
+  document.getElementById('items').innerHTML = shown.map(i=>`
+    <div class="item ${i.packed?'out':'in'}${selected.has(i.id)?' selected':''}">
+      <div class="item-check${selected.has(i.id)?' checked':''}" onclick="toggleSelect(${i.id})"></div>
+      <div class="item-thumb" onclick="${bulkMode?`toggleSelect(${i.id})`:`openModal(${i.id})`}" title="${esc(i.name)}">
+        ${i.hasImage?`<img src="${WEBDAV_BASE}/${i.id}.jpg?cb=${Date.now()}" onerror="this.parentElement.innerHTML='<span class=no-img>📷</span>'" alt="${esc(i.name)}">`:'<span class=no-img>📷</span>'}
+      </div>
+      <div class="item-name">${esc(i.name)}</div>
+      <span class="item-zone ${i.zone.replace(/\s+/g,'')}">${esc(i.zone)}</span>
+      <label class="toggle" onclick="${bulkMode?'':`toggle(${i.id})`}">
+        <input type="checkbox" ${i.packed?'checked':''} ${bulkMode?'disabled':''} onchange="${bulkMode?'':`toggle(${i.id})`}">
+        <div class="toggle-track"></div>
+        <div class="toggle-label out">OUT</div>
+        <div class="toggle-label in">IN</div>
+      </label>
+    </div>`).join('');
 }
 
 // Init
