@@ -1,0 +1,34 @@
+# OpenClaw workspace — not relevant to PackTrack visitors
+AGENTS.md
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+MEMORY.md
+SOUL.md
+TOOLS.md
+USER.md
+memory/
+mission-control/
+
+# OS junk
+.DS_Store
+*.log
+
+# OpenClaw internals
+.openclaw/
+.clawhub/
+skills/
+
+# Misc
+nextcloud-creds.pdf
+*.pdf
+Screenshots/
+
+# PackTrack app files (add the ones you want to keep)
+# Keep these:
+# packtrack.html
+# packtrack-icon.png
+# upload.php
+# README.md
+packtrack-iphone.png
+packtrack-mini.png
