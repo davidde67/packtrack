@@ -49,11 +49,42 @@ PackTrack started as a single-page HTML app for one very specific problem: David
 
 ## Live Demo
 
-👉 **https://packtrack-demo.netlify.app** — try it now! PIN is `000000`.
+**`demo.html`** in this repo is the standalone demo. Open it directly in any browser — no server, no Nextcloud needed.
 
-Fully functional, pre-loaded with 15 fake items. Resets on refresh (no account needed).
+- PIN is `000000`
+- Pre-loaded with 15 fake items
+- **All core features work** — add items, toggle IN/OUT, sort, filter, zones editor, bulk select
+- **Photo upload does NOT work in the demo** — `upload.php` doesn't exist in demo mode (see Requirements below)
+- Data resets on page refresh (localStorage only, no backend)
+
+To run the demo: download `demo.html` and open it in your browser, or host it on any static host.
 
 ---
+
+## Requirements
+
+PackTrack is **not a simple file drop** — it requires a specific backend setup:
+
+### ✅ What you need
+
+- **A Nextcloud instance** (self-hosted, or a Nextcloud subscription account) with:
+  - WebDAV access enabled
+  - A dedicated user account for PackTrack
+  - A `packtrack_images/` folder in that user's WebDAV root
+  - A `packlist.json` file (created automatically on first save)
+  - A `.packtrack_pin.json` file (created on first PIN setup)
+
+### ❌ What won't work
+
+- **Regular shared hosting / WordPress / cPanel-only hosts** — these typically don't have Nextcloud or full WebDAV support
+- **Generic static hosting** (Netlify, Vercel, GitHub Pages) — fine for `demo.html`, but the real app needs a WebDAV backend
+- **Any host without PHP** (for `upload.php`) — photo upload will fail without the PHP proxy
+
+> ⚠️ **If your host doesn't have Nextcloud with WebDAV access, the app will not function.** The entire data layer depends on Nextcloud's WebDAV API for reading, writing, and photo storage. There is no fallback for non-Nextcloud hosts.
+
+### Photo upload note
+
+Photo upload requires `upload.php` (a small PHP proxy) hosted alongside `packtrack.html`. This is intentional — direct browser-to-Nextcloud WebDAV PUT requests are blocked by CORS policy in most browser configurations. The PHP proxy handles the hop. Make sure your host supports PHP.
 
 ## Deploy Your Own
 
@@ -116,6 +147,7 @@ Add it to your phone's home screen (PWA mode) and it works offline too.
 
 | Version | Date | Highlights |
 |---------|------|-----------|
+| v1.0.2 | 2026-04-05 | Fix image upload — restored PHP proxy approach (direct WebDAV PUT blocked by CORS) |
 | v1.01 | 2026-03-31 | Zones manager panel, confirmation modals, per-zone color coding, Unassigned zone |
 | v6 | 2026-03-30 | Zones editor, bulk select, multi-select move, inline rename |
 | v5 | 2026-03-30 | Sort system (room/A-Z/IN/OUT), zone filter buttons with counts, "X to go" |
