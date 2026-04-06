@@ -1,0 +1,6 @@
+# OS junk
+.DS_Store
+*.log
+
+# Credentials (never commit these)
+# Update these values before deploying!
